@@ -1,0 +1,80 @@
+#!/usr/bin/ruby -wKu
+# -*- coding: utf-8 -*-
+# vim: set fileencoding=utf-8 :
+=begin
+一行が「日付<SEP>品物<SEP>値段<SEP>種類」のフォーマットの
+ファイルから使った金額の合計を計算
+（SEPは区切り文字。詳細はigrep-cashbook.rbを参照。）
+"<spaces or none>#"で始まる行はコメント
+=end
+
+$VERBOSE = true
+$KCODE = 'u' if RUBY_VERSION < '1.9'
+
+require 'optparse'
+require 'enumerator'
+
+require 'rubygems'
+require 'backports'
+require_relative 'igrep-cashbook'
+
+opt = OptionParser.new
+
+categories = []
+opt.on('-c', '--categories=COMMA_SEPARATED_VALUES', Array) {|v|
+  categories = v
+}
+opt.parse!(ARGV)
+matcher = \
+  if categories.empty?
+    Proc.new{ true }
+  else
+    lambda{|cols| categories.include? cols[3] }
+  end
+
+def warn_zero line, name, lineno, price
+  warn "[WARNING] Invalid line: #{line.inspect} at #{name}: #{lineno}" if price <= 0
+end
+
+sums = Hash.new 0
+con_sum = 0
+income = 0
+ARGF.each {|line|
+  next if line =~ COMMENT
+  cols      = line.chomp.split(SEP)
+  price_str = cols[PRICE_COLUMN].to_s
+  price     = price_str.to_i
+  group     = cols[GROUP_COLUMN]
+
+  warn_zero line, ARGF.path, ARGF.file.lineno, price
+
+  if price_str.start_with? PLUS
+    income += price
+  else
+    if matcher[cols]
+      sums[group] += price
+      con_sum    += price
+    end
+  end
+}
+
+income_s    = income.to_s
+con_sum_s   = con_sum.to_s
+grand_sum_s = ( income - con_sum ).to_s
+
+income_digi    = income_s.length
+con_sum_digi   = con_sum_s.length
+grand_sum_digi = grand_sum_s.length
+
+digit = [ income_digi, con_sum_digi, grand_sum_digi ].max
+
+sums.keys.sort_by{|group|
+  sums[group]
+}.each{|key|
+  puts "#{key}\t#{sums[key].to_s.rjust(digit)}"
+}
+puts "支出\t#{con_sum_s.rjust(digit)}"
+if income > 0
+  puts "収入\t#{income_s.rjust(digit)}"
+  puts "計\t#{grand_sum_s.rjust(digit)}"
+end
