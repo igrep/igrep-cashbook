@@ -1,0 +1,9 @@
+HC = 'ghc'
+OPTS = '--make -Wall -fno-warn-unused-do-bind'
+PROGRAM = ENV['TARGET_PROGRAM'] || 'sum'
+
+task :default => PROGRAM
+
+file PROGRAM => PROGRAM + '.hs' do|t|
+  sh "#{HC} #{OPTS} #{t.source} -o #{t.name}"
+end
