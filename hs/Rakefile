@@ -1,9 +1,15 @@
 HC = 'ghc'
 OPTS = '--make -Wall -fno-warn-unused-do-bind'
-PROGRAM = ENV['TARGET_PROGRAM'] || 'sum'
+if ENV['SRC']
+  SRC = ENV['SRC']
+  PROGRAM = SRC.sub /\.l?hs$/, ''
+else
+  PROGRAM = 'sum'
+  SRC = PROGRAM + '.hs'
+end
 
 task :default => PROGRAM
 
-file PROGRAM => PROGRAM + '.hs' do|t|
+file PROGRAM => SRC do|t|
   sh "#{HC} #{OPTS} #{t.source} -o #{t.name}"
 end
