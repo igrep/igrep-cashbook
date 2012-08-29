@@ -7,7 +7,10 @@ import os.path
 
 def int_ruby_style(string):
   """parse a string into an integer like String#to_s on Ruby"""
+  try:
     return int( string.replace( '_', '' ) )
+  except ValueError:
+    return 0
 
 def warn_file_format( out, line, file_name, line_no ):
   print >>out, "Invalid line: {0!r} at {1}: {2}".format(
@@ -30,7 +33,7 @@ if by_android:
   import glob
   money_dir = '/mnt/sdcard/My/money/'
   default_pattern = '[0-9][0-9]-[0-9][0-9].txt'
-  default_file = os.path.basename( max( glob.glob( money_dir + default_pattern ) )
+  default_file = os.path.basename( max( glob.glob( money_dir + default_pattern ) ) )
   file_pattern = droid.dialogGetInput('ARGV:', 'Enter file pattern.', default_file ).result
   file_list = glob.glob( money_dir + file_pattern )
 
