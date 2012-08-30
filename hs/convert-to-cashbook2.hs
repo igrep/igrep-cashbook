@@ -26,8 +26,6 @@ formatGroup [] = ""
 formatGroup xs = ( getDateOfGroup xs ):( map stripDate xs )
   where
     getDateOfGroup xs = getDate $ find ( not . isComment ) xs
-    isComment [('#':_)] = True
-    isComment _ = False
     stripDate :: Item -> String
     stripDate [s@('#':_)] = s
     stripDate ( day:name:price:group:xs ) = " " ++ name ++ "  " ++ price ++ "  " ++ group ++ concat xs
