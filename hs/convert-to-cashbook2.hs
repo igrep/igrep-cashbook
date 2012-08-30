@@ -1,41 +1,28 @@
 import qualified Data.Map as Map
 import Control.Monad
 import Data.List
-import Text.Regex
 import System.IO
 
--- General function
-equalBy :: (Eq b) => ( a -> b ) -> a -> a -> Bool
-equalBy f a1 a2 = f a1 == f a2
-
-type Item = [String]
-
-getDate :: Item -> String
-getDate = (!!0)
+import IgrepCashbook
 
 convertLines :: [String] -> [String]
 convertLines ls =
-  map formatGroup $ groupBy isSameDate $ map ( fixIncomeLine . parse ) ls
+  map formatGroup $ groupBy sameDate $ map ( fixIncomeLine . parseLine ) ls
   where
-    isSameDate :: Item -> Item -> Bool
-    isSameDate ['#':_] _ = True
-    isSameDate _ ['#':_] = True
-    isSameDate = equalBy getDate
-
-parse :: String -> Item
-parse s@('#':_) = [s]
-parse = splitRegex "  +|\t"
+    sameDate :: Item -> Item -> Bool
+    sameDate ['#':_] _ = True
+    sameDate _ ['#':_] = True
+    sameDate i1 i2 = equalBy getDate i1 i2
 
 fixIncomeLine :: Item -> Item
-fixIncomeLine [x] = [x]
 fixIncomeLine [day, name, price]
+--         add regex representing salary
   | name ~= "" = day:name:price:["給料"]
   | otherwise = day:name:price:["その他"]
 fixIncomeLine xs = xs
 
 formatGroup :: [Item] -> [String]
 formatGroup [] = ""
--- how to handle comment lines
 formatGroup xs = ( getDateOfGroup xs ):( map stripDate xs )
   where
     getDateOfGroup xs = getDate $ find ( not . isComment ) xs
@@ -48,7 +35,7 @@ formatGroup xs = ( getDateOfGroup xs ):( map stripDate xs )
 
 main = do
   args <- getArgs
-  forM args \ a -> do
+  forM args ( \ a -> do
     contents <- readFile a
-    let new_money = unlines $ convertLine . lines contents
-    writeFile new_money $ a ++ ".new"
+    let new_money = unlines convertLines lines contents
+    writeFile new_money $ a ++ ".new" )
