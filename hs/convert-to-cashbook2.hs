@@ -10,8 +10,8 @@ convertLines ls =
   map formatGroup $ groupBy sameDate $ map ( fixIncomeLine . parseLine ) ls
   where
     sameDate :: Item -> Item -> Bool
-    sameDate ['#':_] _ = True
-    sameDate _ ['#':_] = True
+    sameDate [('#':_)] _ = True
+    sameDate _ [('#':_)] = True
     sameDate i1 i2 = equalBy getDate i1 i2
 
 fixIncomeLine :: Item -> Item
@@ -28,7 +28,8 @@ formatGroup xs = ( getDateOfGroup xs ):( map stripDate xs )
     getDateOfGroup xs = getDate $ find ( not . isComment ) xs
     stripDate :: Item -> String
     stripDate [s@('#':_)] = s
-    stripDate ( day:name:price:group:xs ) = " " ++ name ++ "  " ++ price ++ "  " ++ group ++ concat xs
+    stripDate ( _day:name:price:group:xs ) =
+      " " ++ name ++ "  " ++ price ++ "  " ++ group ++ "  " ++ concat xs
     stripDate xs = error "Invalid data: " ++ show xs
 
 main = do
