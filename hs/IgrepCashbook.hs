@@ -1,4 +1,13 @@
-module IgrepCashbook where
+module IgrepCashbook
+( equalBy
+, Item
+, parseLine
+, getDate
+, isComment
+)
+where
+
+-- for old style cashbook
 
 import Text.Regex
 
