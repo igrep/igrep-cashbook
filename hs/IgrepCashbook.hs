@@ -11,7 +11,9 @@ type Item = [String]
 parseLine :: String -> Item
 parseLine "" = [""]
 parseLine s@('#':_) = [s]
-parseLine = splitRegex "  +|\t"
+parseLine s = splitRegex r s
+  where
+    r = mkRegex "  +|\t"
 
 getDate :: Item -> String
 getDate = (!!0)
