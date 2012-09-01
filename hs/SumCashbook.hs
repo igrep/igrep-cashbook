@@ -3,6 +3,7 @@ module SumCashbook where
 import qualified Data.Map as Map
 import Data.List
 
+import IgrepCashbook
 import IgrepCashbook2
 
 {-splitBy2spaces :: String -> [String]-}
@@ -12,16 +13,6 @@ import IgrepCashbook2
 type Group       = String
 type SignedPrice = String
 type Summary     = Map.Map Group Int
-
--- Use Map.fromListWith instead!
-updateSummary :: Group -> Int -> Summary -> Summary
-updateSummary _ 0 summary = summary
-updateSummary group int summary = updateWith current
-  where
-    current = Map.lookup group summary
-    updateWith :: Maybe Int -> Summary
-    updateWith Nothing = Map.insert $ group int summary
-    updateWith Just i  = Map.insert $ group int + i summary
 
 isIncome :: ( Group, SignedPrice ) -> Bool
 isIncome _ '+':_ = True
