@@ -1,6 +1,8 @@
 import qualified Data.Map as Map
 import Data.List
 
+import SumCashbook
+
 {-splitBy2spaces :: String -> [String]-}
 {-splitBy2spaces "" = []-}
 {-splitBy2spaces "  " = []-}

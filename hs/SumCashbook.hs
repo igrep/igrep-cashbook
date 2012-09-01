@@ -1,34 +1,98 @@
-module MigrateCashbook where
-
-import IgrepCashbook
+module SumCashbook where
 
 import qualified Data.Map as Map
 import Data.List
-import Text.Regex
 
-convertLines :: [String] -> [String]
-convertLines ls =
-  map formatGroup $ groupBy isSameDate $ map ( fixIncomeLine . parseLine ) ls
+import IgrepCashbook2
+
+{-splitBy2spaces :: String -> [String]-}
+{-splitBy2spaces "" = []-}
+{-splitBy2spaces "  " = []-}
+
+type Group       = String
+type SignedPrice = String
+type Summary     = Map.Map Group Int
+
+-- Use Map.fromListWith instead!
+updateSummary :: Group -> Int -> Summary -> Summary
+updateSummary _ 0 summary = summary
+updateSummary group int summary = updateWith current
   where
-    isSameDate :: Item -> Item -> Bool
-    isSameDate ['#':_] _ = True
-    isSameDate _ ['#':_] = True
-    isSameDate = equalBy getDate
+    current = Map.lookup group summary
+    updateWith :: Maybe Int -> Summary
+    updateWith Nothing = Map.insert $ group int summary
+    updateWith Just i  = Map.insert $ group int + i summary
 
-fixIncomeLine :: Item -> Item
-fixIncomeLine [x] = [x]
-fixIncomeLine [day, name, price]
-  | name ~= "" = day:name:price:["給料"]
-  | otherwise = day:name:price:["その他"]
-fixIncomeLine xs = xs
+isIncome :: ( Group, SignedPrice ) -> Bool
+isIncome _ '+':_ = True
+isIncome _ _ = False
 
-formatGroup :: [Item] -> [String]
-formatGroup [] = ""
--- how to handle comment lines
-formatGroup xs = ( getDateOfGroup xs ):( map stripDate xs )
+getGroupPrice :: String -> Int -> [String] -> (Group, SignedPrice)
+getGroupPrice f i [] = error "[ERROR] Invalid Argument: Empty item!" ++ " at " ++ f ++ ": " ++ i ++ "."
+getGroupPrice f i [ _ ] = error "[ERROR] Invalid Argument: Price and group not found!" ++ " at " ++ f ++ ": " ++ i ++ "."
+getGroupPrice f i [ _, _ ] = error "[ERROR] Invalid Argument: Group not found!" ++ " at " ++ f ++ ": " ++ i ++ "."
+getGroupPrice _ _ xs = ( xs !! 2, xs !! 1 )
+
+parseItemLine :: String -> [String]
+parseItemLine = splitRegexPR "  +|\t"
+
+-- Is there any solution to handle errors?
+selectItemLine :: String -> [Int] -> [String] -> [String]
+selectItemLine fn ns ls = filter isItemLine $ zip ns ls 
   where
-    getDateOfGroup xs = getDate $ find ( not . isComment ) xs
-    stripDate :: Item -> String
-    stripDate [s@('#':_)] = s
-    stripDate ( day:name:price:group:xs ) = " " ++ name ++ "  " ++ price ++ "  " ++ group ++ concat xs
-    stripDate xs = error "Invalid data: " ++ show xs
+    isItemLine :: ( Int, String ) -> Bool
+    isItemLine ( n, l ) = ( ItemLine == ) . classifyLine fn n l
+
+classifyLine :: String -> Int -> String -> LineType
+classifyLine _ _ "" = CommentLine
+classifyLine _ _ '#':_ = CommentLine
+classifyLine _ _ ' ':_ = ItemLine
+classifyLine f i s
+  | s =~ "^[0-9]" = DateLine
+  | otherwise = error "[ERROR] Invalid line: " ++ show s ++ " at " ++ f ++ ": " ++ i ++ "."
+
+data LineType = CommentLine | ItemLine | DateLine deriving (Show)
+
+{-data Item { isIncome :: Bool-}
+          {-, group :: Group-}
+          {-, price :: Int } deriving ( Show, Ord )-}
+
+sortBySum :: Summary -> [ ( Group, Int ) ]
+sortBySum s = map ( \ k -> ( k, getPrice k ) ) ks
+  where
+    ks = sortBy ( \ a b -> getPrice a `compare` getPrice b ) Map.keys s
+    getPrice = ( flip Map.lookup ) s
+
+line_nums = [1..]
+
+itemLines = selectItemLine filename line_nums lines
+groupPrices = map getGroupPrice $ map parseItemLine itemLines
+( incomes, expenditures ) = partition isIncome groupPrices
+inSummary = Map.fromListWith (+) incomes
+exSummary = Map.fromListWith (+) expenditures
+
+inSum = sum $ Map.values inSummary
+exSum = sum $ Map.valies exSummary
+
+formatSummary :: [ ( Group, Int ) ] -> String
+formatSummary xs = concatMap formatItem xs
+
+maxDigit = max inD exD
+  where
+    inD = length show inSum
+    exD = length show exSum
+
+formatItem ( g, i ) = g ++ "\t%" ++ printf ( "%" ++ show maxDigit ++ "d\n" ) i
+
+main = do
+  args <- getArgs
+  filename =  args !! 0
+  contents <- readFile filename
+  lines =  line contents 
+
+  putStrLn "# INCOME #"
+  putStrLn formatSummary exSummary
+  putStrLn formatItem ( "Sum", exSum )
+  putStrLn "# EXPENDITURES #"
+  putStrLn formatSummary inSummary
+  putStrLn formatItem ( "Sum", inSum )
