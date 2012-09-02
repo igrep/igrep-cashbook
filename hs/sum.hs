@@ -17,6 +17,10 @@ parseContents c =
    ns = [ 1..( length ls ) ]
    is = selectItemLine ns ls
 
+selectItemLine :: [Int] -> [String] -> [(Int, String)]
+selectItemLine ns ls =
+  filter ( \(n, l) -> isItemLine l ) $ zip ns ls
+
 main = do
   args <- getArgs
   forM args (\a -> do
@@ -27,8 +31,8 @@ main = do
     let ( inItems, exItems ) = classifyItems items'
     let exSummary = summarizeItems exItems
     let inSummary = summarizeItems inItems
-    let exSum = sum $ Map.values exSummary    
-    let inSum = sum $ Map.values inSummary    
+    let exSum = sum $ Map.values exSummary
+    let inSum = sum $ Map.values inSummary
 
     putStrLn "# EXPENDITURES #"
     putStrLn formatSummary exSummary
