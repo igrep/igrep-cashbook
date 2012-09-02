@@ -34,6 +34,7 @@ main = do
     let exSum = sum $ Map.values exSummary
     let inSum = sum $ Map.values inSummary
 
+    -- TODO: print summary of all files in specified in the argument
     putStrLn "# EXPENDITURES #"
     putStrLn formatSummary exSummary
     putStrLn formatItem "Sum" exSum
