@@ -8,13 +8,23 @@ type Group       = String
 type SignedPrice = String
 type Summary     = Map.Map Group Int
 
+-- Item: synonim of [String] so far
+parseContents :: String -> [(Int, Item)]
+parseContents c =
+ map ( \(n, l) -> ( name, n, parseItemLine l ) ) is
+ where
+   ls = lines c
+   ns = [ 1..( length ls ) ]
+   is = selectItemLine ns ls
+
 main = do
   args <- getArgs
   forM args (\a -> do
     contents <- readFile a
 
     let items = parseContents contents
-    let ( inItems, exItems ) = classifyItems items
+    let items' = rejectInvalidItems items
+    let ( inItems, exItems ) = classifyItems items'
     let exSummary = summarizeItems exItems
     let inSummary = summarizeItems inItems
     let exSum = sum $ Map.values exSummary    
