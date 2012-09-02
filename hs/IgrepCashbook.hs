@@ -18,7 +18,6 @@ equalBy f a1 a2 = f a1 == f a2
 type Item = [String]
 
 parseLine :: String -> Item
-parseLine "" = [""]
 parseLine s@('#':_) = [s]
 parseLine s = splitRegex r s
   where

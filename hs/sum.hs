@@ -11,11 +11,11 @@ type Summary     = Map.Map Group Int
 -- Item: synonim of [String] so far
 parseContents :: String -> [(Int, Item)]
 parseContents c =
- map ( \(n, l) -> ( name, n, parseItemLine l ) ) is
- where
-   ls = lines c
-   ns = [ 1..( length ls ) ]
-   is = selectItemLine ns ls
+  map ( \(n, l) -> ( n, parseItemLine l ) ) is
+  where
+    ls = lines c
+    ns = [ 1..( length ls ) ]
+    is = selectItemLine ns ls
 
 selectItemLine :: [Int] -> [String] -> [(Int, String)]
 selectItemLine ns ls =

@@ -2,12 +2,11 @@ module IgrepCashbook2
 ( Item
 , isComment
 , isItemLine
+, parseItemLine
 )
 where
 
 -- for new style cashbook
-
-import Text.Regex
 
 import qualified IgrepCashbook as Old
 
@@ -18,3 +17,7 @@ isComment = Old.isComment
 isItemLine :: String -> Bool
 isItemLine (' ':_) = True
 isItemLine _ = False
+
+parseItemLine :: String -> Item
+parseItemLine (' ':s) = Old.parseLine s
+parseItemLine s = [s]
