@@ -9,7 +9,7 @@ type SignedPrice = String
 type Summary     = Map.Map Group Int
 
 -- Item: synonim of [String] so far
-parseContents :: String -> [(Int, Item)]
+parseContents :: String -> [(Int, Either String Item)]
 parseContents c =
   map ( \(n, l) -> ( n, parseItemLine l ) ) is
   where
@@ -21,13 +21,21 @@ selectItemLine :: [Int] -> [String] -> [(Int, String)]
 selectItemLine ns ls =
   filter ( \(n, l) -> isItemLine l ) $ zip ns ls
 
+itemsAndErrors :: [(Int, Either String Item)] -> ([Item], [String])
+itemsAndErrors xs = foldr f ([], []) xs
+  where
+    f :: (Int, Either String Item) -> ([Item], [String]) -> ([Item], [String])
+    f (n, Left s) (is, ss) = (is, (s ++ " at line " ++ read n):ss)
+    f (_, Right i) (is, ss) = (i:is, ss)
+
 main = do
   args <- getArgs
   forM args (\a -> do
     contents <- readFile a
 
     let items = parseContents contents
-    let items' = rejectInvalidItems items
+    let ( items', errors ) = itemsAndErrors items
+    warnErrors a errors
     let ( inItems, exItems ) = classifyItems items'
     let exSummary = summarizeItems exItems
     let inSummary = summarizeItems inItems
