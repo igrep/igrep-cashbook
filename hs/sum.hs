@@ -1,6 +1,7 @@
 import qualified Data.Map as Map
 import Data.List
 import System.IO
+import Control.Monad
 
 import IgrepCashbook2
 
@@ -27,6 +28,11 @@ itemsAndErrors xs = foldr f ([], []) xs
     f :: (Int, Either String Item) -> ([Item], [String]) -> ([Item], [String])
     f (n, Left s) (is, ss) = (is, (s ++ " at line " ++ read n):ss)
     f (_, Right i) (is, ss) = (i:is, ss)
+
+warnErrors :: String -> [String] -> IO ()
+warnErrors path es = forM_ es $ (\e -> do
+  -- how to warn upon stderr?
+  hPutStrLn StdErr "[ERROR] " ++ e ++ " of " ++ path ++ ".")
 
 main = do
   args <- getArgs
