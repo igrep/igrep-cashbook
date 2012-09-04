@@ -11,7 +11,7 @@ type Summary     = Map.Map Group Int
 -- Item: synonim of [String] so far
 parseContents :: String -> [(Int, Either String Item)]
 parseContents c =
-  map ( \(n, l) -> ( n, parseItemLine l ) ) is
+  map ( \(n, l) -> ( n, validateItem parseItemLine l ) ) is
   where
     ls = lines c
     ns = [ 1..( length ls ) ]
