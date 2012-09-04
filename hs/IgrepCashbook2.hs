@@ -23,7 +23,12 @@ parseItemLine :: String -> Item
 parseItemLine (' ':s) = Old.parseLine s
 parseItemLine s = [s]
 
-emptyItem = ""
+emptyItem = "invalid item: empty item. no data given"
+noPriceAndGroup = "invalid item: neither price nor group given"
+noGroup = "invalid item: no group given"
+invalidPrice = "invalid item: malformed price"
+
+priceRegex = mkRegex "^+?[1-9][_,0-9]*$"
 
 validateItem :: Item -> Either String Item
 validateItem [] = Left emptyItem
