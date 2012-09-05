@@ -5,8 +5,6 @@ import Control.Monad
 
 import IgrepCashbook2
 
-type Group       = String
-type SignedPrice = String
 type Summary     = Map.Map Group Int
 
 -- Item: synonim of [String] so far
@@ -34,8 +32,8 @@ warnErrors path es = forM_ es $ (\e -> do
   -- how to warn upon stderr?
   hPutStrLn StdErr "[ERROR] " ++ e ++ " of " ++ path ++ ".")
 
-classifyItems :: [Item] -> ([Item], [Item])
-classifyItems is = partition (\i -> isIncomePrice getSignedPrice i ) is
+incomesAndExpenditures :: [Item] -> ([Item], [Item])
+incomesAndExpenditures is = partition (\i -> isIncomePrice getSignedPrice i ) is
 
 main = do
   args <- getArgs
@@ -45,7 +43,7 @@ main = do
     let items = parseContents contents
     let ( items', errors ) = itemsAndErrors items
     warnErrors a errors
-    let ( inItems, exItems ) = classifyItems items'
+    let ( inItems, exItems ) = incomesAndExpenditures items'
     let exSummary = summarizeItems exItems
     let inSummary = summarizeItems inItems
     let exSum = sum $ Map.values exSummary
