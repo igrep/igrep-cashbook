@@ -27,8 +27,7 @@ itemsAndErrors xs = foldr f ([], []) xs
 
 warnErrors :: String -> [String] -> IO ()
 warnErrors path es = forM_ es $ (\e -> do
-  -- how to warn upon stderr?
-  hPutStrLn StdErr "[ERROR] " ++ e ++ " of " ++ path ++ ".")
+  hPutStrLn stderr "[WARNING] " ++ e ++ " of " ++ path ++ ". OMMITED!")
 
 incomesAndExpenditures :: [Item] -> ([Item], [Item])
 incomesAndExpenditures is = partition ( isIncomePrice . getSignedPrice ) is
