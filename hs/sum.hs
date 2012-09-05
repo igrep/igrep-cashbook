@@ -5,8 +5,6 @@ import Control.Monad
 
 import IgrepCashbook2
 
-type Summary     = Map.Map Group Int
-
 -- Item: synonim of [String] so far
 parseContents :: String -> [(Int, Either String Item)]
 parseContents c =
@@ -33,7 +31,13 @@ warnErrors path es = forM_ es $ (\e -> do
   hPutStrLn StdErr "[ERROR] " ++ e ++ " of " ++ path ++ ".")
 
 incomesAndExpenditures :: [Item] -> ([Item], [Item])
-incomesAndExpenditures is = partition (\i -> isIncomePrice getSignedPrice i ) is
+incomesAndExpenditures is = partition ( isIncomePrice . getSignedPrice ) is
+
+type Summary = Map.Map Group Int
+
+summarizeItems :: [Item] -> Summary
+summarizeItems is =
+  Map.fromListWith (+) $ map (\i -> (getName i, getPrice i) ) is
 
 main = do
   args <- getArgs

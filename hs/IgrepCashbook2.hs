@@ -38,8 +38,19 @@ validateItem i@(_name:signedPrice:_group:_)
   | signedPrice =~ priceRegex -> Right i
   | otherwise -> Left $ invalidPrice ++ show i
 
+getName :: Item -> String
+getName = ( !! 0)
+
 getSignedPrice :: Item -> String
 getSignedPrice = ( !! 1)
+
+getPrice :: Item -> Int
+getPrice i = read $ filter isNumberChar $ getSignedPrice i
+  where
+    isNumberChar x = x `elem` ['0'..'9']
+
+getGroup :: Item -> String
+getGroup = ( !! 2)
 
 isIncomePrice :: String -> Bool
 isIncomePrice s = ( s !! 0 ) == '+'
