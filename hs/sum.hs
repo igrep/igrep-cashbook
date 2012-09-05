@@ -40,22 +40,23 @@ summarizeItems is =
 
 main = do
   args <- getArgs
-  forM args (\a -> do
+  items <- forM args (\a -> do
     contents <- readFile a
 
     let items = parseContents contents
     let ( items', errors ) = itemsAndErrors items
     warnErrors a errors
-    let ( inItems, exItems ) = incomesAndExpenditures items'
-    let exSummary = summarizeItems exItems
-    let inSummary = summarizeItems inItems
-    let exSum = sum $ Map.values exSummary
-    let inSum = sum $ Map.values inSummary
+    return items' )
 
-    -- TODO: print summary of all files in specified in the argument
-    putStrLn "# EXPENDITURES #"
-    putStrLn formatSummary exSummary
-    putStrLn formatItem "Sum" exSum
-    putStrLn "# INCOME #"
-    putStrLn formatSummary inSummary
-    putStrLn formatItem "Sum" inSum )
+  let ( inItems, exItems ) = incomesAndExpenditures concat items
+  let exSummary = summarizeItems exItems
+  let inSummary = summarizeItems inItems
+  let exSum = sum $ Map.values exSummary
+  let inSum = sum $ Map.values inSummary
+
+  putStrLn "# EXPENDITURES #"
+  putStrLn formatSummary exSummary
+  putStrLn formatItem "Sum" exSum
+  putStrLn "# INCOME #"
+  putStrLn formatSummary inSummary
+  putStrLn formatItem "Sum" inSum
