@@ -34,6 +34,9 @@ warnErrors path es = forM_ es $ (\e -> do
   -- how to warn upon stderr?
   hPutStrLn StdErr "[ERROR] " ++ e ++ " of " ++ path ++ ".")
 
+classifyItems :: [Item] -> ([Item], [Item])
+classifyItems is = partition (\i -> isIncomePrice getSignedPrice i ) is
+
 main = do
   args <- getArgs
   forM args (\a -> do

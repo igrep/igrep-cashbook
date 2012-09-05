@@ -37,3 +37,9 @@ validateItem i@[_name, _signedPrice] = Left $ noGroup ++ show i
 validateItem i@(_name:signedPrice:_group:_)
   | signedPrice =~ priceRegex -> Right i
   | otherwise -> Left $ invalidPrice ++ show i
+
+getSignedPrice :: Item -> String
+getSignedPrice = ( !! 1)
+
+isIncomePrice :: String -> Bool
+isIncomePrice s = ( s !! 0 ) == '+'
