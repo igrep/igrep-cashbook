@@ -2,6 +2,7 @@ import qualified Data.Map as Map
 import Data.List
 import System.IO
 import Control.Monad
+import qualified Data.Text as Text
 
 import IgrepCashbook2
 
@@ -41,8 +42,17 @@ summarizeItems is =
 digit :: Int -> Int
 digit = length . show
 
+formatSummary :: Int -> Int -> Summary -> String
+formatSummary l d s = concatMap f $ Map.toList s
+  where
+    f (g, i) = formatSumItem l d g i
+
+formatSumItem :: Int -> Int -> String -> Int -> String
+formatSumItem l d g i = Text.justifyLeft l ' '  g ++ Text.justifyRight d ' ' ( show i )
+
 main = do
   args <- getArgs
+  -- NOTE: concatForM?
   items <- forM args (\a -> do
     contents <- readFile a
 
@@ -61,7 +71,7 @@ main = do
 
   putStrLn "# EXPENDITURES #"
   putStrLn formatSummary groupLen sumDigit exSummary
-  putStrLn formatItem groupLen sumDigit "Sum" exSum
+  putStrLn formatSumItem groupLen sumDigit "Sum" exSum
   putStrLn "# INCOME #"
   putStrLn formatSummary groupLen sumDigit inSummary
-  putStrLn formatItem sumDigit groupLen "Sum" inSum
+  putStrLn formatSumItem sumDigit groupLen "Sum" inSum
