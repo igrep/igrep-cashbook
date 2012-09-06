@@ -61,7 +61,7 @@ formatSummary l d s = concatMap f $ Map.toList s
     f (g, i) = formatSumItem l d g i
 
 formatSumItem :: Int -> Int -> String -> Int -> String
-formatSumItem l d g i = justifyLeft l ' '  g ++ justifyRight d ' ' ( show i )
+formatSumItem l d g i = justifyLeft l ' '  g ++ justifyRight d ' ' ( show i ) ++ "\n"
 
 main = do
   args <- getArgs
