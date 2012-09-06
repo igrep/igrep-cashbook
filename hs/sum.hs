@@ -36,7 +36,7 @@ itemsAndErrors :: [(Int, Either String Item)] -> ([Item], [String])
 itemsAndErrors xs = foldr f ([], []) xs
   where
     f :: (Int, Either String Item) -> ([Item], [String]) -> ([Item], [String])
-    f (n, Left s) (is, ss) = (is, (s ++ " at line " ++ read n):ss)
+    f (n, Left s) (is, ss) = (is, (s ++ " at line " ++ show n):ss)
     f (_, Right i) (is, ss) = (i:is, ss)
 
 warnErrors :: String -> [String] -> IO ()
