@@ -6,6 +6,19 @@ import qualified Data.Text as Text
 
 import IgrepCashbook2
 
+-- general functions
+
+useTextFunc :: (Text -> Text) -> String -> String
+useTextFunc f s = Text.unpack f Text.pack s
+
+justifyRight :: Int -> Char -> String -> String
+justifyRight i c s = useTextFunc ( Text.justifyRight i c ) s
+
+justifyLeft :: Int -> Char -> String -> String
+justifyLeft i c s = useTextFunc ( Text.justifyLeft i c ) s
+
+--
+
 -- Item: synonim of [String] so far
 parseContents :: String -> [(Int, Either String Item)]
 parseContents c =
@@ -48,7 +61,7 @@ formatSummary l d s = concatMap f $ Map.toList s
     f (g, i) = formatSumItem l d g i
 
 formatSumItem :: Int -> Int -> String -> Int -> String
-formatSumItem l d g i = Text.justifyLeft l ' '  g ++ Text.justifyRight d ' ' ( show i )
+formatSumItem l d g i = justifyLeft l ' '  g ++ justifyRight d ' ' ( show i )
 
 main = do
   args <- getArgs
