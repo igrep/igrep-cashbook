@@ -38,6 +38,9 @@ summarizeItems :: [Item] -> Summary
 summarizeItems is =
   Map.fromListWith (+) $ map (\i -> (getName i, getPrice i) ) is
 
+digit :: Int -> Int
+digit = length . show
+
 main = do
   args <- getArgs
   items <- forM args (\a -> do
@@ -53,10 +56,12 @@ main = do
   let inSummary = summarizeItems inItems
   let exSum = sum $ Map.values exSummary
   let inSum = sum $ Map.values inSummary
+  let sumDigit = max $ (digit exSum) (digit inSum) 
+  let groupLen = 10 -- fixed so far
 
   putStrLn "# EXPENDITURES #"
-  putStrLn formatSummary exSummary
-  putStrLn formatItem "Sum" exSum
+  putStrLn formatSummary groupLen sumDigit exSummary
+  putStrLn formatItem groupLen sumDigit "Sum" exSum
   putStrLn "# INCOME #"
-  putStrLn formatSummary inSummary
-  putStrLn formatItem "Sum" inSum
+  putStrLn formatSummary groupLen sumDigit inSummary
+  putStrLn formatItem sumDigit groupLen "Sum" inSum
