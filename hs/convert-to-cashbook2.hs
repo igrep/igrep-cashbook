@@ -26,7 +26,6 @@ convertLines c =
 
 fixIncomeLine :: Item -> Item
 fixIncomeLine [day, name, price]
---         add regex representing salary
   | isNothing $ matchRegex r name = day:name:price:["給料"]
   | otherwise = day:name:price:["その他"]
   where
