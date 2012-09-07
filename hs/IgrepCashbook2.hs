@@ -3,6 +3,13 @@ module IgrepCashbook2
 , isComment
 , isItemLine
 , parseItemLine
+, priceRegex
+, validateItem
+, getName
+, getSignedPrice
+, getPrice
+, getGroup
+, isIncomePrice
 )
 where
 
