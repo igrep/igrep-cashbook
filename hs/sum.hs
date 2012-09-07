@@ -9,7 +9,7 @@ import IgrepCashbook2
 -- general functions
 
 useTextFunc :: (Text -> Text) -> String -> String
-useTextFunc f s = Text.unpack f Text.pack s
+useTextFunc f s = Text.unpack f $ Text.pack s
 
 justifyRight :: Int -> Char -> String -> String
 justifyRight i c s = useTextFunc ( Text.justifyRight i c ) s
@@ -61,7 +61,12 @@ formatSummary l d s = concatMap f $ Map.toList s
     f (g, i) = formatSumItem l d g i
 
 formatSumItem :: Int -> Int -> String -> Int -> String
-formatSumItem l d g i = justifyLeft l ' '  g ++ justifyRight d ' ' ( show i ) ++ "\n"
+formatSumItem l d g i =
+  justifyLeft jl ' '  g ++ justifyRight d ' ' ( show i ) ++ "\n"
+  where
+    jl = l - ( length $ filter ( not . is8bitChar ) g )
+    is8bitChar :: Char -> Bool
+    is8bitChar = ( < 255 ) . ord
 
 main = do
   args <- getArgs
