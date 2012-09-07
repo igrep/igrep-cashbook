@@ -33,7 +33,7 @@ selectItemLine ns ls =
   filter ( \(n, l) -> isItemLine l ) $ zip ns ls
 
 itemsAndErrors :: [(Int, Either String Item)] -> ([Item], [String])
-itemsAndErrors xs = foldr f ([], []) xs
+itemsAndErrors = foldr f ([], [])
   where
     f :: (Int, Either String Item) -> ([Item], [String]) -> ([Item], [String])
     f (n, Left s) (is, ss) = (is, (s ++ " at line " ++ show n):ss)
@@ -44,7 +44,7 @@ warnErrors path es = forM_ es $ (\e -> do
   hPutStrLn stderr "[WARNING] " ++ e ++ " of " ++ path ++ ". OMMITED!")
 
 incomesAndExpenditures :: [Item] -> ([Item], [Item])
-incomesAndExpenditures is = partition ( isIncomePrice . getSignedPrice ) is
+incomesAndExpenditures = partition ( isIncomePrice . getSignedPrice )
 
 type Summary = Map.Map Group Int
 
