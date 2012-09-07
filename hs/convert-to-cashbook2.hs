@@ -11,8 +11,8 @@ equalBy f a1 a2 = f a1 == f a2
 --
 
 convertLines :: [String] -> [String]
-convertLines ls =
-  map formatGroup $ groupBy sameDate $ map ( fixIncomeLine . parseLine ) ls
+convertLines =
+  map formatGroup $ groupBy sameDate $ map ( fixIncomeLine . parseLine )
   where
     sameDate :: Item -> Item -> Bool
     sameDate [('#':_)] _ = True
@@ -30,7 +30,9 @@ formatGroup :: [Item] -> [String]
 formatGroup [] = ""
 formatGroup xs = ( getDateOfGroup xs ):( map stripDate xs )
   where
-    getDateOfGroup xs = getDate $ find ( not . isComment ) xs
+    getDateOfGroup :: [Item] -> String
+    getDateOfGroup = getDate $ find ( not . isComment )
+
     stripDate :: Item -> String
     stripDate [s@('#':_)] = s
     stripDate ( _day:name:price:group:xs ) =
