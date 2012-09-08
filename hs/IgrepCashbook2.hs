@@ -16,7 +16,7 @@ where
 -- for new style cashbook
 
 import qualified IgrepCashbook as Old
-import Text.Regex
+import Text.Regex.Posix
 
 type Item = Old.Item
 
@@ -35,15 +35,15 @@ noPriceAndGroup = "invalid item: neither price nor group given"
 noGroup = "invalid item: no group given"
 invalidPrice = "invalid item: malformed price"
 
-priceRegex = mkRegex "^+?[1-9][_,0-9]*$"
+priceRegex = "^+?[1-9][_,0-9]*$"
 
 validateItem :: Item -> Either String Item
 validateItem [] = Left emptyItem
 validateItem [name] = Left $ noPriceAndGroup ++ show name
 validateItem i@[_name, _signedPrice] = Left $ noGroup ++ show i
 validateItem i@(_name:signedPrice:_group:_)
-  | signedPrice =~ priceRegex -> Right i
-  | otherwise -> Left $ invalidPrice ++ show i
+  | signedPrice =~ priceRegex = Right i
+  | otherwise = Left $ invalidPrice ++ show i
 
 getName :: Item -> String
 getName = ( !! 0)

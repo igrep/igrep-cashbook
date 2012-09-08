@@ -1,7 +1,7 @@
 import qualified Data.Map as Map
 import Data.List
 import Data.Maybe
-import Data.String.Utils
+import qualified Data.String.Utils as Str
 import Control.Monad
 import System.IO
 import Text.Regex
@@ -49,7 +49,7 @@ formatGroup xs = ( getDateOfGroup xs ):( map stripDate xs )
     stripDate ( _day:name:price:group:[] ) =
       mkItemStr name price group
     stripDate ( _day:name:price:group:xs ) =
-      ( mkItemStr name price group ) ++ "  " ++ join "  " xs
+      ( mkItemStr name price group ) ++ "  " ++ Str.join "  " xs
     stripDate xs = error "Invalid data: " ++ show xs
 
     mkItemStr :: String -> String -> String -> String
