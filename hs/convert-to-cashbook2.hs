@@ -1,7 +1,8 @@
 import qualified Data.Map as Map
-import Control.Monad
 import Data.List
 import Data.Maybe
+import Data.String.Utils
+import Control.Monad
 import System.IO
 import Text.Regex
 import System.Environment (getArgs)
@@ -26,7 +27,7 @@ convertLines c =
 
 fixIncomeLine :: Item -> Item
 fixIncomeLine [day, name, price]
-  | isNothing $ matchRegex r name = day:name:price:["給料"]
+  | isJust $ matchRegex r name = day:name:price:["給料"]
   | otherwise = day:name:price:["その他"]
   where
     r = mkRegex "給料|財形貯蓄"
@@ -38,15 +39,22 @@ formatGroup xs = ( getDateOfGroup xs ):( map stripDate xs )
   where
     getDateOfGroup :: [Item] -> String
     getDateOfGroup is = f $ find ( not . isComment ) is
+
     f :: Maybe Item -> String
     f (Just x) = getDate x
     f Nothing = ""
 
     stripDate :: Item -> String
     stripDate [s@('#':_)] = s
+    stripDate ( _day:name:price:group:[] ) =
+      mkItemStr name price group
     stripDate ( _day:name:price:group:xs ) =
-      " " ++ name ++ "  " ++ price ++ "  " ++ group ++ "  " ++ concat xs
+      ( mkItemStr name price group ) ++ "  " ++ join "  " xs
     stripDate xs = error "Invalid data: " ++ show xs
+
+    mkItemStr :: String -> String -> String -> String
+    mkItemStr name price group =
+      " " ++ name ++ "  " ++ price ++ "  " ++ group
 
 main = do
   args <- getArgs
