@@ -35,7 +35,7 @@ noPriceAndGroup = "invalid item: neither price nor group given"
 noGroup = "invalid item: no group given"
 invalidPrice = "invalid item: malformed price"
 
-priceRegex = "^+?[1-9][_,0-9]*$"
+priceRegex = "^\+?[1-9][_,0-9]*$"
 
 validateItem :: Item -> Either String Item
 validateItem [] = Left emptyItem
