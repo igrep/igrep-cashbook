@@ -3,7 +3,7 @@ import Data.List
 import Data.Maybe
 import qualified Data.String.Utils as Str
 import Control.Monad
-import System.IO
+-- import System.IO
 import Text.Regex
 import System.Environment (getArgs)
 
@@ -44,21 +44,23 @@ formatGroup xs = ( getDateOfGroup xs ):( map stripDate xs )
     f (Just x) = getDate x
     f Nothing = ""
 
-    stripDate :: Item -> String
-    stripDate [s@('#':_)] = s
-    stripDate ( _day:name:price:group:[] ) =
-      mkItemStr name price group
-    stripDate ( _day:name:price:group:xs ) =
-      ( mkItemStr name price group ) ++ "  " ++ Str.join "  " xs
-    stripDate xs = error "Invalid data: " ++ show xs
+mkItemStr :: String -> String -> String -> String
+mkItemStr name price gr =
+  " " ++ name ++ "  " ++ price ++ "  " ++ gr
 
-    mkItemStr :: String -> String -> String -> String
-    mkItemStr name price group =
-      " " ++ name ++ "  " ++ price ++ "  " ++ group
+stripDate :: Item -> String
+stripDate [s@('#':_)] = s
+stripDate ( _day:name:price:gr:[] ) =
+  mkItemStr name price gr
+stripDate ( _day:name:price:gr:xs ) =
+  ( mkItemStr name price gr ) ++ "  " ++ Str.join "  " xs
+stripDate xs = Str.join "  " xs
 
+main :: IO ()
 main = do
   args <- getArgs
   forM args ( \ a -> do
     contents <- readFile a
     let new_money = unlines $ convertLines $ lines contents
     writeFile ( a ++ ".new" ) new_money  )
+  return ()
