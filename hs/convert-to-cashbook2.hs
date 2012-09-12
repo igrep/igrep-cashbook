@@ -59,8 +59,7 @@ stripDate xs = Str.join "  " xs
 main :: IO ()
 main = do
   args <- getArgs
-  forM args ( \ a -> do
+  forM_ args ( \ a -> do
     contents <- readFile a
     let new_money = unlines $ convertLines $ lines contents
     writeFile ( a ++ ".new" ) new_money  )
-  return ()
