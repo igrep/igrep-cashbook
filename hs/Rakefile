@@ -17,10 +17,10 @@ file PROGRAM => SRC do|t|
 end
 
 task :install => PROGRAM do|t|
-  mv PROGRAM, INSTALL_DIR
+  mv PROGRAM, File.join( INSTALL_DIR, PROGRAM + '.hs' )
 end
 
 task :run => :install do|t|
   Dir.chdir INSTALL_DIR
-  sh "#{File.join INSTALL_DIR, PROGRAM} [0-9][0-9]/[0-9][0-9].txt [0-9][0-9]-[0-9][0-9].txt"
+  sh "#{File.join INSTALL_DIR, PROGRAM + '.hs'} [0-9][0-9]/[0-9][0-9].txt [0-9][0-9]-[0-9][0-9].txt"
 end

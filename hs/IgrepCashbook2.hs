@@ -20,6 +20,7 @@ import Text.Regex.Posix
 
 type Item = Old.Item
 
+isComment :: Item -> Bool
 isComment = Old.isComment
 
 isItemLine :: String -> Bool
@@ -30,12 +31,17 @@ parseItemLine :: String -> Item
 parseItemLine (' ':s) = Old.parseLine s
 parseItemLine s = [s]
 
+emptyItem :: String
 emptyItem = "invalid item: empty item. no data given"
+noPriceAndGroup :: String
 noPriceAndGroup = "invalid item: neither price nor group given"
+noGroup :: String
 noGroup = "invalid item: no group given"
+invalidPrice :: String
 invalidPrice = "invalid item: malformed price"
 
-priceRegex = "^\+?[1-9][_,0-9]*$"
+priceRegex :: String
+priceRegex = "^\\+?[1-9][_,0-9]*$"
 
 validateItem :: Item -> Either String Item
 validateItem [] = Left emptyItem
