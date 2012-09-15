@@ -19,7 +19,8 @@ convertLines c =
     is = map ( fixIncomeLine . parseLine ) c
     gs = groupBy sameDate is
     sameDate :: Item -> Item -> Bool
-    sameDate [('#':_)] _ = True
+    sameDate [('#':_)] [('#':_)] = True
+    sameDate [('#':_)] _ = False
     sameDate _ [('#':_)] = True
     sameDate i1 i2 = equalBy getDate i1 i2
 
@@ -34,14 +35,15 @@ fixIncomeLine xs = xs
 
 formatGroup :: [Item] -> [String]
 formatGroup [] = []
-formatGroup xs = ( getDateOfGroup xs ):( map stripDate xs )
+formatGroup xs = concatDateGroup dateOfGroup withoutDate
   where
-    getDateOfGroup :: [Item] -> String
-    getDateOfGroup is = f $ find ( not . isComment ) is
-
-    f :: Maybe Item -> String
-    f (Just x) = getDate x
-    f Nothing = ""
+    dateOfGroup :: Maybe String
+    dateOfGroup = fmap getDate $ find ( not . isComment ) xs
+    withoutDate :: [String]
+    withoutDate = map stripDate xs
+    concatDateGroup :: Maybe String -> [String] -> [String]
+    concatDateGroup Nothing g = g
+    concatDateGroup (Just d ) g = d:g
 
 mkItemStr :: String -> String -> String -> String
 mkItemStr name price gr =
