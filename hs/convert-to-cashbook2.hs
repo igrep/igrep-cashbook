@@ -1,10 +1,8 @@
 import qualified Data.Map as Map
 import Data.List
-import Data.Maybe
 import qualified Data.String.Utils as Str
 import Control.Monad
 -- import System.IO
-import Text.Regex
 import System.Environment (getArgs)
 
 import IgrepCashbook
@@ -27,10 +25,11 @@ convertLines c =
 
 fixIncomeLine :: Item -> Item
 fixIncomeLine [day, name, price]
-  | isJust $ matchRegex r name = day:name:price:["給料"]
+  | isSaraly name = day:name:price:["給料"]
   | otherwise = day:name:price:["その他"]
   where
-    r = mkRegex "給料|財形貯蓄"
+    isSaraly x =
+      x `isInfixOf` "給料" || x `isInfixOf` "財形貯蓄"
 fixIncomeLine xs = xs
 
 formatGroup :: [Item] -> [String]
