@@ -8,15 +8,17 @@ where
 
 -- for old style cashbook
 
-import Text.Regex
-
 type Item = [String]
 
 parseLine :: String -> Item
 parseLine s@('#':_) = [s]
-parseLine s = splitRegex r s
+parseLine s = fst folded : snd folded
   where
-    r = mkRegex "  +|\t"
+    folded = foldr f ("", []) s
+    f :: Char -> (String, Item) -> (String, Item)
+    f ' ' (' ':t, i) = ("", t:i)
+    f '\t' (t, i) = ("", t:i)
+    f c (t, i) = (c:t, i)
 
 getDate :: Item -> String
 getDate = (!!0)
