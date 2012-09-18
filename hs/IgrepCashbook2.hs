@@ -2,6 +2,8 @@ module IgrepCashbook2
 ( Item
 , isComment
 , isItemLine
+, isDateLine
+, dateRegex
 , parseItemLine
 , priceRegex
 , validateItem
@@ -24,12 +26,18 @@ isComment :: Item -> Bool
 isComment = Old.isComment
 
 isItemLine :: String -> Bool
-isItemLine (' ':_) = True
-isItemLine _ = False
+isItemLine x = not $ isCommentLine x || isDateLine x
+
+isDateLine :: String -> Bool
+isDateLine x = x =~ dateRegex
+isDateLine _ = False
+
+dateRegex :: String
+dateRegex = "^[01][0-9]/[0-9][0-9]/[0-9][0-9]$"
 
 parseItemLine :: String -> Item
 parseItemLine (' ':s) = Old.parseLine s
-parseItemLine s = [s]
+parseItemLine s = Old.parseLine s
 
 emptyItem :: String
 emptyItem = "invalid item: empty item. no data given"

@@ -3,6 +3,7 @@ module IgrepCashbook
 , parseLine
 , getDate
 , isComment
+, isCommentLine
 )
 where
 
@@ -24,5 +25,8 @@ getDate :: Item -> String
 getDate = (!!0)
 
 isComment :: Item -> Bool
-isComment [('#':_)] = True
-isComment _ = False
+isComment [x] = isCommentLine x
+
+isCommentLine :: String -> Bool
+isCommentLine ('#':_) = True
+isCommentLine _ = False
