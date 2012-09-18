@@ -1,5 +1,6 @@
 module IgrepCashbook2
-( Item
+( CashbookLine
+, Item
 , isComment
 , isItemLine
 , isDateLine
@@ -20,13 +21,21 @@ where
 import qualified IgrepCashbook as Old
 import Text.Regex.Posix
 
-data Line =
-  Comment String |
-    Item
+data CashbookLine =
+  Comment String
+  | Item
     { name :: String
     , price :: Int
     , group :: String
     , date  :: Maybe String }
+
+parseWithoutDate :: String -> ( Int, Either String CashbookLine )
+parseWithoutDate c = 
+  map ( \(n, l) -> ( n, validateItem $ parseItemLine l ) ) is
+  where
+    ls = lines c
+    ns = [ 1..( length ls ) ]
+    is = selectItemLine ns ls
 
 isComment :: Item -> Bool
 isComment = Old.isComment

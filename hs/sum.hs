@@ -23,15 +23,6 @@ justifyLeft i c s = useTextFunc ( Text.justifyLeft i c ) s
 
 --
 
--- Item: synonim of [String] so far
-parseContents :: String -> [(Int, Either String Item)]
-parseContents c =
-  map ( \(n, l) -> ( n, validateItem $ parseItemLine l ) ) is
-  where
-    ls = lines c
-    ns = [ 1..( length ls ) ]
-    is = selectItemLine ns ls
-
 selectItemLine :: [Int] -> [String] -> [(Int, String)]
 selectItemLine ns ls =
   filter ( \(n, l) -> isItemLine l ) $ zip ns ls
