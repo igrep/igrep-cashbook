@@ -20,7 +20,13 @@ where
 import qualified IgrepCashbook as Old
 import Text.Regex.Posix
 
-type Item = Old.Item
+data Line =
+  Comment String |
+    Item
+    { name :: String
+    , price :: Int
+    , group :: String
+    , date  :: Maybe String }
 
 isComment :: Item -> Bool
 isComment = Old.isComment
