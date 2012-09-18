@@ -26,6 +26,7 @@ getDate = (!!0)
 
 isComment :: Item -> Bool
 isComment [x] = isCommentLine x
+isComment _ = False
 
 isCommentLine :: String -> Bool
 isCommentLine ('#':_) = True

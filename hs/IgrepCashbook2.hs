@@ -1,7 +1,6 @@
 module IgrepCashbook2
 ( CashbookLine
-, Item
-, isComment
+, isCommentLine
 , isItemLine
 , isDateLine
 , dateRegex
@@ -37,8 +36,8 @@ parseWithoutDate c =
     ns = [ 1..( length ls ) ]
     is = selectItemLine ns ls
 
-isComment :: Item -> Bool
-isComment = Old.isComment
+isCommentLine :: Item -> Bool
+isCommentLine = Old.isCommentLine
 
 isItemLine :: String -> Bool
 isItemLine x = not $ isCommentLine x || isDateLine x
