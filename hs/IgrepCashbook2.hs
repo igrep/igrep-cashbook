@@ -5,6 +5,7 @@ module IgrepCashbook2
 , dateRegex
 , priceRegex
 , parseWithoutDate
+, ignoreComments
 , getDate
 , getName
 , getPrice
@@ -38,6 +39,18 @@ parseWithoutDate c = map parseLineWithoutDate nls'
       | otherwise = parseItemLineWithoutDate n x
     parseItemLineWithoutDate = itemFromLine Nothing
 
+dateRegex :: String
+dateRegex = "^[01][0-9]/[0-9][0-9]/[0-9][0-9]$"
+
+priceRegex :: String
+priceRegex = "^\\+?[1-9][_,0-9]*$"
+
+ignoreComments :: [CashbookLine] -> [CashbookLine]
+ignoreComments = filter nonComment
+  where
+    nonComment ( Comment _ ) = False
+    nonComment _ = True
+
 {-
 isItemLine :: String -> Bool
 isItemLine x = not $ Old.isCommentLine x || isDateLine x
@@ -45,9 +58,6 @@ isItemLine x = not $ Old.isCommentLine x || isDateLine x
 
 isDateLine :: String -> Bool
 isDateLine x = x =~ dateRegex
-
-dateRegex :: String
-dateRegex = "^[01][0-9]/[0-9][0-9]/[0-9][0-9]$"
 
 parseItemLine :: String -> Item
 parseItemLine (' ':s) = Old.parseLine s
@@ -61,9 +71,6 @@ noGroup :: String
 noGroup = "invalid item: no group given"
 invalidPrice :: String
 invalidPrice = "invalid item: malformed price"
-
-priceRegex :: String
-priceRegex = "^\\+?[1-9][_,0-9]*$"
 
 itemFromLine :: Maybe String -> Int -> String -> Either String CashbookLine
 itemFromLine d n x = validate $ Old.parseLine x
