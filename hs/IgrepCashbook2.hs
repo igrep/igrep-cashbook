@@ -1,23 +1,20 @@
 module IgrepCashbook2
-( CashbookLine
-, isCommentLine
-, isItemLine
-, isDateLine
+( Comment
+, Item
 , dateRegex
-, parseItemLine
 , priceRegex
-, validateItem
+, parseWithoutDate
 , getName
 , getSignedPrice
 , getPrice
 , getGroup
-, isIncomePrice
 )
 where
 
 -- for new style cashbook
 
 import qualified IgrepCashbook as Old
+impprt Data.String.Utils (join)
 import Text.Regex.Posix
 
 data CashbookLine =
@@ -28,23 +25,23 @@ data CashbookLine =
     , group :: String
     , date  :: Maybe String }
 
-parseWithoutDate :: String -> ( Int, Either String CashbookLine )
-parseWithoutDate c = 
-  map ( \(n, l) -> ( n, validateItem $ parseItemLine l ) ) is
+parseWithoutDate :: String -> [ Either String CashbookLine ]
+parseWithoutDate c = map parseLineWithoutDate nls'
   where
     ls = lines c
     ns = [ 1..( length ls ) ]
-    is = selectItemLine ns ls
-
-isCommentLine :: Item -> Bool
-isCommentLine = Old.isCommentLine
+    nls = zip ns ls
+    nls' = filter (\(n, x) ->  not $ isDateLine x ) nls
+    parseLineWithoutDate (n, x)
+      | Old.isCommentLine x = Right Comment x
+      | otherwise = parseItemLineWithoutDate n x
+    parseItemLineWithoutDate = itemFromLine Nothing
 
 isItemLine :: String -> Bool
-isItemLine x = not $ isCommentLine x || isDateLine x
+isItemLine x = not $ Old.isCommentLine x || isDateLine x
 
 isDateLine :: String -> Bool
 isDateLine x = x =~ dateRegex
-isDateLine _ = False
 
 dateRegex :: String
 dateRegex = "^[01][0-9]/[0-9][0-9]/[0-9][0-9]$"
@@ -65,13 +62,18 @@ invalidPrice = "invalid item: malformed price"
 priceRegex :: String
 priceRegex = "^\\+?[1-9][_,0-9]*$"
 
-validateItem :: Item -> Either String Item
-validateItem [] = Left emptyItem
-validateItem [name] = Left $ noPriceAndGroup ++ show name
-validateItem i@[_name, _signedPrice] = Left $ noGroup ++ show i
-validateItem i@(_name:signedPrice:_group:_)
-  | signedPrice =~ priceRegex = Right i
-  | otherwise = Left $ invalidPrice ++ show i
+itemFromLine :: Maybe String -> Int -> String -> Either String CashbookLine
+itemFromLine d n x = validate $ Old.parseLine x
+  where
+  validate [] = Left emptyItem
+  validate [name] = Left $ mkMsg noPriceAndGroup name
+  validate [name, signedPrice] = Left $ mkMsg noGroup ( name ++ "  " ++ signedPrice )
+  validate i@(name:signedPrice:group:_)
+    | signedPrice =~ priceRegex = Right $ mkItem d name signedPrice group
+    | otherwise = Left $ mkMsg invalidPrice $ join "  " i
+
+  mkMsg :: String -> String -> String
+  mkMsg e c = concat [ e, "\"", c, "\"", " at line ", show n  ]
 
 getName :: Item -> String
 getName = ( !! 0)
