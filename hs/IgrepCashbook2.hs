@@ -1,5 +1,6 @@
 module IgrepCashbook2
-( Comment
+( CashbookLine
+, Comment
 , Item
 , dateRegex
 , priceRegex
@@ -20,10 +21,10 @@ import Text.Regex.Posix
 data CashbookLine =
   Comment String
   | Item
-    { name :: String
+    { date  :: Maybe String
+    , name :: String
     , price :: Int
-    , group :: String
-    , date  :: Maybe String }
+    , group :: String }
 
 parseWithoutDate :: String -> [ Either String CashbookLine ]
 parseWithoutDate c = map parseLineWithoutDate nls'
@@ -37,8 +38,10 @@ parseWithoutDate c = map parseLineWithoutDate nls'
       | otherwise = parseItemLineWithoutDate n x
     parseItemLineWithoutDate = itemFromLine Nothing
 
+{-
 isItemLine :: String -> Bool
 isItemLine x = not $ Old.isCommentLine x || isDateLine x
+-}
 
 isDateLine :: String -> Bool
 isDateLine x = x =~ dateRegex
@@ -74,6 +77,18 @@ itemFromLine d n x = validate $ Old.parseLine x
 
   mkMsg :: String -> String -> String
   mkMsg e c = concat [ e, "\"", c, "\"", " at line ", show n  ]
+
+mkItem :: Maybe String -> String -> String -> String -> CashbookLine
+mkItem d n s g = Item d n p g
+  where
+    p' :: Int
+    p' = mkPrice s
+    p :: Int
+    p = if isIncomePrice s
+          then p'
+          else negate p'
+    mkPrice = read $ filter isNumberChar
+    isNumberChar x = x `elem` ['0'..'9']
 
 getName :: Item -> String
 getName = ( !! 0)
