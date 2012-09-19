@@ -5,8 +5,8 @@ module IgrepCashbook2
 , dateRegex
 , priceRegex
 , parseWithoutDate
+, getDate
 , getName
-, getSignedPrice
 , getPrice
 , getGroup
 )
@@ -15,16 +15,16 @@ where
 -- for new style cashbook
 
 import qualified IgrepCashbook as Old
-impprt Data.String.Utils (join)
+import Data.String.Utils (join)
 import Text.Regex.Posix
 
 data CashbookLine =
   Comment String
   | Item
-    { date  :: Maybe String
-    , name :: String
-    , price :: Int
-    , group :: String }
+    { getDate  :: Maybe String
+    , getName :: String
+    , getPrice :: Int
+    , getGroup :: String }
 
 parseWithoutDate :: String -> [ Either String CashbookLine ]
 parseWithoutDate c = map parseLineWithoutDate nls'
@@ -89,20 +89,6 @@ mkItem d n s g = Item d n p g
           else negate p'
     mkPrice = read $ filter isNumberChar
     isNumberChar x = x `elem` ['0'..'9']
-
-getName :: Item -> String
-getName = ( !! 0)
-
-getSignedPrice :: Item -> String
-getSignedPrice = ( !! 1)
-
-getPrice :: Item -> Int
-getPrice i = read $ filter isNumberChar $ getSignedPrice i
-  where
-    isNumberChar x = x `elem` ['0'..'9']
-
-getGroup :: Item -> String
-getGroup = ( !! 2)
 
 isIncomePrice :: String -> Bool
 isIncomePrice s = ( s !! 0 ) == '+'
