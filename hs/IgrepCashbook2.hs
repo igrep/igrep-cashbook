@@ -14,7 +14,7 @@ where
 
 -- for new style cashbook
 
-import qualified IgrepCashbook as Old
+import qualified IgrepCashbook as Old (isCommentLine, parseLine )
 import Data.String.Utils (join)
 import Text.Regex.Posix
 
