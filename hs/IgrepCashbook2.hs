@@ -37,7 +37,7 @@ parseWithoutDate c = map parseLineWithoutDate nls'
     parseLineWithoutDate (n, x)
       | Old.isCommentLine x = Right Comment x
       | otherwise = parseItemLineWithoutDate n x
-    parseItemLineWithoutDate = itemFromLine Nothing
+    parseItemLineWithoutDate n x = itemFromLine Nothing n x
 
 dateRegex :: String
 dateRegex = "^[01][0-9]/[0-9][0-9]/[0-9][0-9]$"
@@ -73,7 +73,7 @@ invalidPrice :: String
 invalidPrice = "invalid item: malformed price"
 
 itemFromLine :: Maybe String -> Int -> String -> Either String CashbookLine
-itemFromLine d n x = validate $ Old.parseLine x
+itemFromLine d n x = validate $ parseItemLine x
   where
   validate [] = Left emptyItem
   validate [name] = Left $ mkMsg noPriceAndGroup name
