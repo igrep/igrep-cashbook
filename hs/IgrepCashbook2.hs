@@ -1,21 +1,15 @@
 module IgrepCashbook2
-( CashbookLine
-, Comment
-, Item
+( CashbookLine(..)
 , dateRegex
 , priceRegex
 , parseWithoutDate
 , ignoreComments
-, getDate
-, getName
-, getPrice
-, getGroup
 )
 where
 
 -- for new style cashbook
 
-import qualified IgrepCashbook as Old (isCommentLine, parseLine )
+import qualified IgrepCashbook as Old ( Item, isCommentLine, parseLine )
 import Data.String.Utils (join)
 import Text.Regex.Posix
 
@@ -33,10 +27,14 @@ parseWithoutDate c = map parseLineWithoutDate nls'
     ls = lines c
     ns = [ 1..( length ls ) ]
     nls = zip ns ls
-    nls' = filter (\(n, x) ->  not $ isDateLine x ) nls
+    nls' = filter (\(_, x) ->  not $ isDateLine x ) nls
+
+    parseLineWithoutDate :: (Int, String) -> Either String CashbookLine
     parseLineWithoutDate (n, x)
-      | Old.isCommentLine x = Right Comment x
+      | Old.isCommentLine x = Right $ Comment x
       | otherwise = parseItemLineWithoutDate n x
+
+    parseItemLineWithoutDate :: Int -> String -> Either String CashbookLine
     parseItemLineWithoutDate n x = itemFromLine Nothing n x
 
 dateRegex :: String
@@ -59,7 +57,7 @@ isItemLine x = not $ Old.isCommentLine x || isDateLine x
 isDateLine :: String -> Bool
 isDateLine x = x =~ dateRegex
 
-parseItemLine :: String -> Item
+parseItemLine :: String -> Old.Item
 parseItemLine (' ':s) = Old.parseLine s
 parseItemLine s = Old.parseLine s
 
@@ -88,13 +86,13 @@ itemFromLine d n x = validate $ parseItemLine x
 mkItem :: Maybe String -> String -> String -> String -> CashbookLine
 mkItem d n s g = Item d n p g
   where
-    p' :: Int
     p' = mkPrice s
-    p :: Int
     p = if isIncomePrice s
           then p'
           else negate p'
-    mkPrice = read $ filter isNumberChar
+
+    mkPrice :: String -> Int
+    mkPrice x = read $ filter isNumberChar x
     isNumberChar x = x `elem` ['0'..'9']
 
 isIncomePrice :: String -> Bool
