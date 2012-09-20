@@ -27,23 +27,24 @@ selectItemLine :: [Int] -> [String] -> [(Int, String)]
 selectItemLine ns ls =
   filter ( \(n, l) -> isItemLine l ) $ zip ns ls
 
-itemsAndErrors :: [(Int, Either String Item)] -> ([Item], [String])
+-- maybe rewritten with partition isRight
+itemsAndErrors :: [Either String CashbookLine] -> ([CashbookLine], [String])
 itemsAndErrors = foldr f ([], [])
   where
-    f :: (Int, Either String Item) -> ([Item], [String]) -> ([Item], [String])
-    f (n, Left s) (is, ss) = (is, (s ++ " at line " ++ show n):ss)
-    f (_, Right i) (is, ss) = (i:is, ss)
+    f :: Either String CashbookLine -> ([CashbookLine], [String]) -> ([CashbookLine], [String])
+    f (Left s) (is, ss) = (is, s:ss)
+    f (Right i) (is, ss) = (i:is, ss)
 
 warnErrors :: String -> [String] -> IO ()
 warnErrors path es = forM_ es $ (\e -> do
-  hPutStrLn stderr ( "[WARNING] " ++ e ++ " of " ++ path ++ ". OMMITED!" ))
+  hPutStrLn stderr $ ( "[WARNING] " ++ e ++ " of " ++ path ++ ". OMMITED!" ))
 
-incomesAndExpenditures :: [Item] -> ([Item], [Item])
+incomesAndExpenditures :: [CashbookLine] -> ([CashbookLine], [CashbookLine])
 incomesAndExpenditures = partition ( isIncomePrice . getSignedPrice )
 
 type Summary = Map String Int
 
-summarizeItems :: [Item] -> Summary
+summarizeItems :: [CashbookLine] -> Summary
 summarizeItems is =
   Map.fromListWith (+) $ map (\i -> (getName i, getPrice i) ) is
 
@@ -69,7 +70,7 @@ main = do
   items <- forM args (\a -> do
     contents <- readFile a
 
-    let items = parseContents contents
+    let items = parseWithoutDate contents
     let ( items', errors ) = itemsAndErrors items
     warnErrors a errors
     return items' )
