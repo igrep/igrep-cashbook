@@ -3,7 +3,6 @@ module IgrepCashbook2
 , dateRegex
 , priceRegex
 , parseWithoutDate
-, ignoreComments
 )
 where
 
@@ -27,15 +26,10 @@ parseWithoutDate c = map parseLineWithoutDate nls'
     ls = lines c
     ns = [ 1..( length ls ) ]
     nls = zip ns ls
-    nls' = filter (\(_, x) ->  not $ isDateLine x ) nls
+    nls' = filter (\(_, x) ->  isItemLine x ) nls
 
     parseLineWithoutDate :: (Int, String) -> Either String CashbookLine
-    parseLineWithoutDate (n, x)
-      | Old.isCommentLine x = Right $ Comment x
-      | otherwise = parseItemLineWithoutDate n x
-
-    parseItemLineWithoutDate :: Int -> String -> Either String CashbookLine
-    parseItemLineWithoutDate n x = itemFromLine Nothing n x
+    parseLineWithoutDate (n, x) = itemFromLine Nothing n x
 
 dateRegex :: String
 dateRegex = "^[01][0-9]/[0-9][0-9]/[0-9][0-9]$"
@@ -49,10 +43,8 @@ ignoreComments = filter nonComment
     nonComment ( Comment _ ) = False
     nonComment _ = True
 
-{-
 isItemLine :: String -> Bool
 isItemLine x = not $ Old.isCommentLine x || isDateLine x
--}
 
 isDateLine :: String -> Bool
 isDateLine x = x =~ dateRegex

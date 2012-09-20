@@ -23,10 +23,6 @@ justifyLeft i c s = useTextFunc ( Text.justifyLeft i c ) s
 
 --
 
-selectItemLine :: [Int] -> [String] -> [(Int, String)]
-selectItemLine ns ls =
-  filter ( \(n, l) -> isItemLine l ) $ zip ns ls
-
 -- maybe rewritten with partition isRight
 itemsAndErrors :: [Either String CashbookLine] -> ([CashbookLine], [String])
 itemsAndErrors = foldr f ([], [])
@@ -40,7 +36,7 @@ warnErrors path es = forM_ es $ (\e -> do
   hPutStrLn stderr $ ( "[WARNING] " ++ e ++ " of " ++ path ++ ". OMMITED!" ))
 
 incomesAndExpenditures :: [CashbookLine] -> ([CashbookLine], [CashbookLine])
-incomesAndExpenditures = partition ( isIncomePrice . getSignedPrice )
+incomesAndExpenditures = partition isIncome
 
 type Summary = Map String Int
 
