@@ -13,8 +13,9 @@ import Data.String.Utils (join)
 import Text.Regex.Posix
 
 data CashbookLine =
-  Comment String
-  | Item
+--  Comment String
+--  | Item
+  Item
     { getDate  :: Maybe String
     , getName :: String
     , getPrice :: Int
@@ -36,12 +37,6 @@ dateRegex = "^[01][0-9]/[0-9][0-9]/[0-9][0-9]$"
 
 priceRegex :: String
 priceRegex = "^\\+?[1-9][_,0-9]*$"
-
-ignoreComments :: [CashbookLine] -> [CashbookLine]
-ignoreComments = filter nonComment
-  where
-    nonComment ( Comment _ ) = False
-    nonComment _ = True
 
 isItemLine :: String -> Bool
 isItemLine x = not $ Old.isCommentLine x || isDateLine x
