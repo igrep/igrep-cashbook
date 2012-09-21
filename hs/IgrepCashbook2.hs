@@ -26,7 +26,7 @@ parseWithoutDate :: String -> [ Either String CashbookLine ]
 parseWithoutDate c = map parseLineWithoutDate nls'
   where
     ls = lines c
-    ns = [ 1..( length ls ) ]
+    ns = [1..]
     nls = zip ns ls
     nls' = filter (\(_, x) ->  isItemLine x ) nls
 
