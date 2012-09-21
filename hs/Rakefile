@@ -1,6 +1,10 @@
 HC = 'ghc'
 OPTS = ''
-INSTALL_DIR = File.join ENV["HOME"], 'my', 'money'
+INSTALL_ROOT = File.join ENV["HOME"], 'my', 'money'
+
+INSTALL_DIRS = {
+  "sum" => 'new',
+}
 
 if ENV['SRC']
   SRC = ENV['SRC']
@@ -10,6 +14,14 @@ else
   SRC = PROGRAM + '.hs'
 end
 
+INSTALL_DIR = INSTALL_DIRS[PROGRAM].to_s
+
+INSTALL_TO = File.join(
+  INSTALL_ROOT,
+  INSTALL_DIR,
+  PROGRAM + '.hs'
+)
+
 task :default => PROGRAM
 
 file PROGRAM => SRC do|t|
@@ -17,10 +29,10 @@ file PROGRAM => SRC do|t|
 end
 
 task :install => PROGRAM do|t|
-  mv PROGRAM, File.join( INSTALL_DIR, PROGRAM + '.hs' )
+  mv PROGRAM, INSTALL_TO
 end
 
 task :run => :install do|t|
   Dir.chdir INSTALL_DIR
-  sh "#{File.join INSTALL_DIR, PROGRAM + '.hs'} [0-9][0-9]/[0-9][0-9].txt [0-9][0-9]-[0-9][0-9].txt"
+  sh "#{INSTALL_TO} [0-9][0-9]/[0-9][0-9].txt [0-9][0-9]-[0-9][0-9].txt"
 end
