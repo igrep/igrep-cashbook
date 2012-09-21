@@ -19,6 +19,7 @@ data CashbookLine =
     { getDate  :: Maybe String
     , getName :: String
     , getPrice :: Int
+    , isIncome :: Bool
     , getGroup :: String }
 
 parseWithoutDate :: String -> [ Either String CashbookLine ]
@@ -71,12 +72,10 @@ itemFromLine d n x = validate $ parseItemLine x
   mkMsg e c = concat [ e, "\"", c, "\"", " at line ", show n  ]
 
 mkItem :: Maybe String -> String -> String -> String -> CashbookLine
-mkItem d n s g = Item d n p g
+mkItem d n s g = Item d n p ip g
   where
-    p' = mkPrice s
-    p = if isIncomePrice s
-          then p'
-          else negate p'
+    p = mkPrice s
+    ip = isIncomePrice s
 
     mkPrice :: String -> Int
     mkPrice x = read $ filter isNumberChar x
