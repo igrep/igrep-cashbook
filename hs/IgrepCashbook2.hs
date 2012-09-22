@@ -69,7 +69,7 @@ itemFromLine d n x = validate $ parseItemLine x
     | otherwise = Left $ mkMsg invalidPrice $ join "  " i
 
   mkMsg :: String -> String -> String
-  mkMsg e c = concat [ e, "\"", c, "\"", " at line ", show n  ]
+  mkMsg e c = e ++ " \"" ++ c ++ "\" " ++ " at line " ++ show n
 
 mkItem :: Maybe String -> String -> String -> String -> CashbookLine
 mkItem d n s g = Item d n p ip g
