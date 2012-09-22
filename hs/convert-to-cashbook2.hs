@@ -28,10 +28,11 @@ fixIncomeLine :: Item -> Item
 fixIncomeLine [day, name, price]
   | isSaraly name = day:name:price:["給料"]
   | otherwise = day:name:price:["その他"]
-  where
-    isSaraly x =
-      x `isInfixOf` "給料" || x `isInfixOf` "財形貯蓄"
 fixIncomeLine xs = xs
+
+isSaraly :: String -> Bool
+isSaraly name =
+  "給料" `isInfixOf` name || "財形貯蓄" `isInfixOf` name
 
 formatGroup :: [Item] -> [String]
 formatGroup [] = []
