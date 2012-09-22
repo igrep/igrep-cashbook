@@ -70,11 +70,12 @@ main = do
   let exSum = sum $ Map.elems exSummary
   let inSum = sum $ Map.elems inSummary
   let sumDigit = max (digit exSum) (digit inSum) 
-  let groupLen = 10 -- fixed so far
+  let groupLen = 8 -- fixed so far
 
-  putStrLn "# EXPENDITURES #"
-  putStrLn $ formatSummary groupLen sumDigit exSummary
-  putStrLn $ formatSumItem groupLen sumDigit "Sum" exSum
-  putStrLn "# INCOME #"
-  putStrLn $ formatSummary groupLen sumDigit inSummary
-  putStrLn $ formatSumItem groupLen sumDigit "Sum" inSum
+  putStrLn "# 支出 #"
+  putStr   $ formatSummary groupLen sumDigit exSummary
+  putStr   $ formatSumItem groupLen sumDigit "合計" exSum
+  putStr   "\n"
+  putStrLn "# 収入 #"
+  putStr   $ formatSummary groupLen sumDigit inSummary
+  putStr   $ formatSumItem groupLen sumDigit "合計" inSum
