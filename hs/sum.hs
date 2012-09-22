@@ -69,6 +69,7 @@ main = do
   let inSummary = summarizeItems inItems
   let exSum = sum $ Map.elems exSummary
   let inSum = sum $ Map.elems inSummary
+  let wholeSum = inSum - exSum
   let sumDigit = max (digit exSum) (digit inSum) 
   let groupLen = 8 -- fixed so far
 
@@ -79,3 +80,5 @@ main = do
   putStrLn "# 収入 #"
   putStr   $ formatSummary groupLen sumDigit inSummary
   putStr   $ formatSumItem groupLen sumDigit "合計" inSum
+  putStr   "\n"
+  putStr   $ formatSumItem groupLen sumDigit "総合計" wholeSum
