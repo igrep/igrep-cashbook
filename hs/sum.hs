@@ -77,9 +77,7 @@ main = do
   putStrLn "# 支出 #"
   putStr   $ formatSummary groupLen sumDigit exSummary
   putStr   $ formatSumItem groupLen sumDigit "合計" exSum
-  putStr   "\n"
   putStrLn "# 収入 #"
   putStr   $ formatSummary groupLen sumDigit inSummary
   putStr   $ formatSumItem groupLen sumDigit "合計" inSum
-  putStr   "\n"
   putStr   $ formatSumItem groupLen sumDigit "総合計" wholeSum
