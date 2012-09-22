@@ -2,10 +2,12 @@ import qualified Data.Map as Map
 import Data.List
 import qualified Data.String.Utils as Str
 import Control.Monad
--- import System.IO
+import qualified System.FilePath as Path
+import System.FilePath ((</>))
 import System.Environment (getArgs)
 
 import IgrepCashbook
+import System.Directory (createDirectoryIfMissing)
 
 -- general function
 equalBy :: (Eq b) => ( a -> b ) -> a -> a -> Bool
@@ -64,4 +66,8 @@ main = do
   forM_ args ( \ a -> do
     contents <- readFile a
     let new_money = unlines $ convertLines $ lines contents
-    writeFile ( a ++ ".new" ) new_money  )
+    let rootDir = "new"
+    let destDir =  rootDir </> Path.takeDirectory a
+    let dest = rootDir </> a
+    createDirectoryIfMissing True $ destDir
+    writeFile dest new_money  )
