@@ -8,6 +8,8 @@ module IgrepCashbook
 )
 where
 
+import Data.String.Utils (replace)
+
 -- for old style cashbook
 
 type Item = [String]
@@ -15,7 +17,10 @@ type Item = [String]
 parseLine :: String -> Item
 parseLine s
   | isCommentLine s = [s]
-  | otherwise = parseItemLine s
+  | otherwise = parseItemLine $ expandTab s
+
+expandTab :: String -> String
+expandTab = replace "\t" "  "
 
 parseItemLine :: String -> Item
 parseItemLine s = lastCell : accum
