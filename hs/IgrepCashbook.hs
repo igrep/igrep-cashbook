@@ -1,6 +1,7 @@
 module IgrepCashbook
 ( Item
 , parseLine
+, parseItemLine
 , getDate
 , isComment
 , isCommentLine
@@ -12,8 +13,12 @@ where
 type Item = [String]
 
 parseLine :: String -> Item
-parseLine s@('#':_) = [s]
-parseLine s = fst folded : snd folded
+parseLine s
+  | isCommentLine s = [s]
+  | otherwise = parseItemLine s
+
+parseItemLine :: String -> Item
+parseItemLine s = fst folded : snd folded
   where
     folded = foldr f ("", []) s
     f :: Char -> (String, Item) -> (String, Item)

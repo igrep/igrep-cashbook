@@ -8,7 +8,7 @@ where
 
 -- for new style cashbook
 
-import qualified IgrepCashbook as Old ( Item, isCommentLine, parseLine )
+import qualified IgrepCashbook as Old ( Item, isCommentLine, parseItemLine )
 import Data.String.Utils (join)
 import Text.Regex.Posix
 
@@ -46,8 +46,8 @@ isDateLine :: String -> Bool
 isDateLine x = x =~ dateRegex
 
 parseItemLine :: String -> Old.Item
-parseItemLine (' ':s) = Old.parseLine s
-parseItemLine s = Old.parseLine s
+parseItemLine (' ':s) = Old.parseItemLine s
+parseItemLine s = Old.parseItemLine s
 
 emptyItem :: String
 emptyItem = "invalid item: empty item. no data given"
