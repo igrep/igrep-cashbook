@@ -18,13 +18,16 @@ parseLine s
   | otherwise = parseItemLine s
 
 parseItemLine :: String -> Item
-parseItemLine s = fst folded : snd folded
+parseItemLine s = lastCell : accum
   where
-    folded = foldr f ("", []) s
-    f :: Char -> (String, Item) -> (String, Item)
-    f ' ' (' ':t, i) = ("", t:i)
-    f '\t' (t, i) = ("", t:i)
-    f c (t, i) = (c:t, i)
+    ( lastCell, accum, _ ) = folded
+    folded = foldr f ("", [], False) s
+    -- The 3rd value of the tuple means "in spaces"
+    f :: Char -> (String, Item, Bool) -> (String, Item, Bool)
+    f ' ' (' ':t, i, False) = (t, i, True)
+    f ' ' (t, i, True) = (t, i, True)
+    f c (t, i, True) = ([c], t:i, False)
+    f c (t, i, False) = (c:t, i, False)
 
 getDate :: Item -> String
 getDate = (!!0)
