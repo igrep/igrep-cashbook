@@ -8,6 +8,7 @@ import Data.Map ( Map )
 import qualified Data.Text as Text
 import Data.Text ( Text )
 import Data.Either (partitionEithers)
+import Data.Ord (comparing)
 
 import IgrepCashbook2
 
@@ -41,7 +42,7 @@ digit :: Int -> Int
 digit = length . show
 
 formatSummary :: Int -> Int -> Summary -> String
-formatSummary l d s = concatMap f $ Map.toList s
+formatSummary l d s = concatMap f $ sortBy ( comparing snd ) $ Map.toList s
   where
     f (g, i) = formatSumItem l d g i
 
