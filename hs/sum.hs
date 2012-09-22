@@ -7,6 +7,7 @@ import qualified Data.Map as Map
 import Data.Map ( Map )
 import qualified Data.Text as Text
 import Data.Text ( Text )
+import Data.Either (partitionEithers)
 
 import IgrepCashbook2
 
@@ -22,14 +23,6 @@ justifyLeft :: Int -> Char -> String -> String
 justifyLeft i c s = useTextFunc ( Text.justifyLeft i c ) s
 
 --
-
--- maybe rewritten with partition isRight
-itemsAndErrors :: [Either String CashbookLine] -> ([CashbookLine], [String])
-itemsAndErrors = foldr f ([], [])
-  where
-    f :: Either String CashbookLine -> ([CashbookLine], [String]) -> ([CashbookLine], [String])
-    f (Left s) (is, ss) = (is, s:ss)
-    f (Right i) (is, ss) = (i:is, ss)
 
 warnErrors :: String -> [String] -> IO ()
 warnErrors path es = forM_ es $ (\e -> do
@@ -67,7 +60,7 @@ main = do
     contents <- readFile a
 
     let items = parseWithoutDate contents
-    let ( items', errors ) = itemsAndErrors items
+    let ( errors, items' ) = partitionEithers items
     warnErrors a errors
     return items' )
 
