@@ -35,7 +35,7 @@ type Summary = Map String Int
 
 summarizeItems :: [CashbookLine] -> Summary
 summarizeItems is =
-  Map.fromListWith (+) $ map (\i -> (getName i, getPrice i) ) is
+  Map.fromListWith (+) $ map (\i -> (getGroup i, getPrice i) ) is
 
 digit :: Int -> Int
 digit = length . show
