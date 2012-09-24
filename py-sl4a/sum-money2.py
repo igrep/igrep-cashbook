@@ -5,31 +5,37 @@ import re
 import fileinput
 import os.path
 
-class CashbookItem:
-  def __init__(self, name, price, income, group, date = None):
+import warnings
+
+class CashbookItem(object):
+
+  #to parse content of a file
+  comment_re = re.compile( r'^\s*#' )
+  sep        = re.compile( r' {2,}|\t' )
+
+  def __init__(self, name, price, group, date = None):
     self.name = name
     self.price = price
-    self.income = income
     self.group = group
     self.date = date
 
   @classmethod
   def parse_no_date(klass, lines):
-    """parse lines"""
+    """parse lines without date"""
     [ parse_line( line, index + 1 ) for index, line in enumerate(lines) if not comment_re.match( line ) ]
 
   @classmethod
-  def parse_line(klass, line):
+  def parse_line(klass, line, line_no=None):
     """parse a line"""
     try:
       price_str = columns[2]
-      price     = _in( price_str )
+      price     = Price( price_str )
       category  = columns[3] if len( columns ) >= 4 else ''
       file_name = fileinput.filename()
       line_no   = fileinput.filelineno()
     except IndexError, ValueError:
-      warn_file_format( result_out, line, file_name, line_no )
-      continue
+      warnings.warn( result_out, line, file_name, line_no )
+      return None
 
 def int_ruby_style(string):
   """parse a string into an integer like String#to_s on Ruby"""
@@ -67,10 +73,6 @@ else:
   import sys
   result_out = sys.stdout
   file_list = sys.argv[1:]
-
-#to parse content of a file
-comment_re = re.compile( r'^\s*#' )
-sep        = re.compile( r' {2,}|\t' )
 
 #to output a result
 sums_by_categories = dict()
