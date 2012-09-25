@@ -34,7 +34,7 @@ parseWithoutDate c = map parseLineWithoutDate nls'
     parseLineWithoutDate (n, x) = itemFromLine Nothing n x
 
 dateRegex :: String
-dateRegex = "^([01][0-9]/)?[0-9][0-9]/[0-9][0-9]$"
+dateRegex = "^([0-9][0-9]/)?[0-9][0-9]/[0-9][0-9]$"
 
 priceRegex :: String
 priceRegex = "^\\+?[1-9][_,0-9]*$"
