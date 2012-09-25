@@ -35,16 +35,20 @@ class CashbookItem(object):
       price     = Price( price_str )
       category  = columns[2]
     except IndexError:
-      place =  " at line " + str(line_no) if line_no else ''
-      msg "Invalid line: Some fields are missing from \"" + line + "\"" + place
-      warnings.warn( msg, MalformedItem )
+      warn_line( "Invalid line: Some fields are missing", line, line_no )
       return None
     except InvalidPriceError:
-      place =  " at line " + str(line_no) if line_no else ''
-      msg "Invalid line: The price fileld is not valid from \"" + line + "\"" + place
-      warnings.warn( msg, MalformedItem )
+      warn_line( "Invalid line: The price fileld is not valid", line, line_no )
       return None
-    return klass(name, price, group)
+    else:
+      return klass(name, price, group)
+
+  @classmethod
+  def warn_line(klass, cause, line, line_no=line_no):
+    """warn malformed line"""
+    place =  " at line " + ( str(line_no) if line_no else '' )
+    msg = cause + " from \"" + line + "\"" + place
+    warnings.warn( msg, MalformedItem )
 
 class MalformedItem(warnings.UserWarning):
   """representing invalid input"""
