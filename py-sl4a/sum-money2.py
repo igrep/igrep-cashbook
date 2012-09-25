@@ -10,8 +10,9 @@ import warnings
 class CashbookItem(object):
 
   #to parse content of a file
-  comment_re = re.compile( r'^\s*#' )
-  sep        = re.compile( r' {2,}|\t' )
+  comment_re = re.compile( r'^#' )
+  date_re    = re.compile( r'^(\d\d/)?\d\d/\d\d$' )
+  sep        = re.compile( r' {2,}' )
 
   def __init__(self, name, price, group, date = None):
     self.name = name
@@ -20,29 +21,46 @@ class CashbookItem(object):
     self.date = date
 
   @classmethod
-  def parse_no_date(klass, lines):
-    """parse lines without date"""
-    [ parse_line( line, index + 1 ) for index, line in enumerate(lines) if not comment_re.match( line ) ]
+  def generate_no_date(klass, lines):
+    """generate items parsing lines without date"""
+    return ( parse_line( line, index + 1 ) for index, line in enumerate(lines)
+        if not ( comment_re.match( line ) or date_re.match( line ) ) )
 
   @classmethod
   def parse_line(klass, line, line_no=None):
     """parse a line"""
     try:
-      price_str = columns[2]
+      name      = columns[0].lstrip()
+      price_str = columns[1]
       price     = Price( price_str )
-      category  = columns[3] if len( columns ) >= 4 else ''
-      file_name = fileinput.filename()
-      line_no   = fileinput.filelineno()
-    except IndexError, ValueError:
-      warnings.warn( result_out, line, file_name, line_no )
+      category  = columns[2]
+    except IndexError:
+      place =  " at line " + str(line_no) if line_no else ''
+      msg "Invalid line: Some fields are missing from \"" + line + "\"" + place
+      warnings.warn( msg, MalformedItem )
       return None
+    except InvalidPriceError:
+      place =  " at line " + str(line_no) if line_no else ''
+      msg "Invalid line: The price fileld is not valid from \"" + line + "\"" + place
+      warnings.warn( msg, MalformedItem )
+      return None
+    return klass(name, price, group)
 
-def int_ruby_style(string):
-  """parse a string into an integer like String#to_s on Ruby"""
-  try:
-    return int( string.replace( '_', '' ) )
-  except ValueError:
-    return 0
+class MalformedItem(warnings.UserWarning):
+  """representing invalid input"""
+  pass
+
+class Price(object):
+  """representing the price field of the CashbookItem."""
+
+  price_re = re.compile( r'^\+?([1-9])(?:[_,]|([0-9]))*$' )
+
+  def __init__(self, signed_price):
+    if not price_re.match(signed_price):
+      raise InvalidPriceError
+    # extract from match object
+    self.income = sign
+    self.value = int( ''.join( digits ) )
 
 def warn_file_format( out, line, file_name, line_no ):
   print >>out, "Invalid line: {0!r} at {1}: {2}".format(
