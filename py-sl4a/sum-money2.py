@@ -57,14 +57,26 @@ class MalformedItem(warnings.UserWarning):
 class Price(object):
   """representing the price field of the CashbookItem."""
 
-  price_re = re.compile( r'^\+?([1-9])(?:[_,]|([0-9]))*$' )
+  price_re = re.compile( r"""
+      ^(P<sign>\+)?
+      (P<digit1>[1-9])
+      (?:
+        [_,] |
+        (P<digit2>[0-9])
+      )*$
+      """, re.VERBOSE )
 
   def __init__(self, signed_price):
-    if not price_re.match(signed_price):
+    mdat = price_re.match(signed_price)
+    if mdat == None:
       raise InvalidPriceError
     # extract from match object
-    self.income = sign
-    self.value = int( ''.join( digits ) )
+    self.income = 0 == len( mdat('sign') )
+    self.value = int( mdat( 'digit1' ) + mdat( 'digit2' ) )
+
+class InvalidPriceError(Error):
+  """representing invalid price"""
+  pass
 
 def warn_file_format( out, line, file_name, line_no ):
   print >>out, "Invalid line: {0!r} at {1}: {2}".format(
