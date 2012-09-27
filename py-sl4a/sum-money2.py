@@ -5,12 +5,10 @@ import re
 import fileinput
 import os.path
 
-import warnings
-
 class CashbookItem(object):
 
   #to parse content of a file
-  comment_re = re.compile( r'^#' )
+  comment_token = '#'
   date_re    = re.compile( r'^(\d\d/)?\d\d/\d\d$' )
   sep        = re.compile( r' {2,}' )
 
@@ -21,36 +19,31 @@ class CashbookItem(object):
     self.date = date
 
   @classmethod
-  def generate_no_date(klass, lines):
-    """generate items parsing lines without date"""
-    return ( parse_line( line, index + 1 ) for index, line in enumerate(lines)
-        if not ( comment_re.match( line ) or date_re.match( line ) ) )
-
-  @classmethod
-  def parse_line(klass, line, line_no=None):
+  def parse_line(klass, line):
     """parse a line"""
+    if line.starts_with( comment_token ) || date_re.match( line ):
+      return None
+
+    columns = sep.split( line.strip() )
     try:
-      name      = columns[0].lstrip()
+      name      = columns[0]
       price_str = columns[1]
       price     = Price( price_str )
       category  = columns[2]
     except IndexError:
-      warn_line( "Invalid line: Some fields are missing", line, line_no )
-      return None
+      raise_with_line( "Invalid line: Some fields are missing", line )
     except InvalidPriceError:
-      warn_line( "Invalid line: The price fileld is not valid", line, line_no )
-      return None
+      raise_with_line( "Invalid line: The price fileld is not valid", line )
     else:
       return klass(name, price, group)
 
   @classmethod
-  def warn_line(klass, cause, line, line_no=line_no):
-    """warn malformed line"""
-    place =  " at line " + ( str(line_no) if line_no else '' )
-    msg = cause + " from \"" + line + "\"" + place
-    warnings.warn( msg, MalformedItem )
+  def raise_with_line(klass, cause, line):
+    """raise for a malformed line"""
+    msg = cause + " from \"" + line + "\""
+    raise MalformedItemError( msg )
 
-class MalformedItem(warnings.UserWarning):
+class MalformedItemError(Error):
   """representing invalid input"""
   pass
 
@@ -77,10 +70,6 @@ class Price(object):
 class InvalidPriceError(Error):
   """representing invalid price"""
   pass
-
-def warn_file_format( out, line, file_name, line_no ):
-  print >>out, "Invalid line: {0!r} at {1}: {2}".format(
-    line, file_name, line_no )
 
 try:
   import android
@@ -117,18 +106,23 @@ expense_sum = 0
 
 utf8_hook = fileinput.hook_encoded("utf-8")
 
-with warnings.catch_warnings( MalformedItem ) as w:
-  for item in CashbookItem.generate_no_date(
-      fileinput.input( file_list, openhook=utf8_hook )
-    ):
-    if item.price.income:
-      incomes[ category ] = \
-          incomes.get( category, 0 ) + item.price.value
-      income_sum +=  item.price.value
-    else:
-      expenses[ category ] = \
-          expenses.get( category, 0 ) + item.price.value
-      expense_sum += item.price.value
+for line in fileinput.input( file_list, openhook=utf8_hook ):
+  try:
+    item = CashbookItem.parse_line(line)
+  except MalformedItemError as err:
+    print >>result_out, \
+        u"[WARNING] {0} at {1} of {2}.".format(
+            ''.join( err.args ), line_no, file_name )
+    next
+  next if item == None
+  if item.price.income:
+    incomes[ category ] = \
+        incomes.get( category, 0 ) + item.price.value
+    income_sum +=  item.price.value
+  else:
+    expenses[ category ] = \
+        expenses.get( category, 0 ) + item.price.value
+    expense_sum += item.price.value
 
 total_str = str( income_sum - expense_sum )
 
