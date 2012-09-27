@@ -9,14 +9,14 @@ class CashbookItem(object):
 
   #to parse content of a file
   comment_token = '#'
-  date_re    = re.compile( r'^(\d\d/)?\d\d/\d\d$' )
-  sep        = re.compile( r' {2,}' )
+  date_re       = re.compile( r'^(\d\d/)?\d\d/\d\d$' )
+  sep           = re.compile( r' {2,}' )
 
   def __init__(self, name, price, group, date = None):
-    self.name = name
+    self.name  = name
     self.price = price
     self.group = group
-    self.date = date
+    self.date  = date
 
   @classmethod
   def parse_line(klass, line):
@@ -51,6 +51,7 @@ class MalformedItemError(Exception):
 class Price(object):
   """representing the price field of the CashbookItem."""
 
+  # fix! seems wrong
   price_re = re.compile( r"""
       ^(P<sign>\+)?
       (P<digit1>[1-9])
@@ -113,9 +114,11 @@ for line in fileinput.input( file_list, openhook=utf8_hook ):
   except MalformedItemError as err:
     print >>result_out, \
         u"[WARNING] {0} at {1} of {2}.".format(
-            err.args, line_no, file_name )
+            err.cause, line_no, file_name )
     next
+
   next if item == None
+
   if item.price.income:
     incomes[ category ] = \
         incomes.get( category, 0 ) + item.price.value
