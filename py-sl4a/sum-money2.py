@@ -109,40 +109,32 @@ else:
   file_list = sys.argv[1:]
 
 #to output a result
-sums_by_categories = dict()
-income             = 0
-expense            = 0
+## Use counter module instead!
+incomes     = dict()
+expenses    = dict()
+income_sum  = 0
+expense_sum = 0
 
 utf8_hook = fileinput.hook_encoded("utf-8")
-for line in fileinput.input( file_list, openhook=utf8_hook ):
-  if comment_re.match( line ): continue
 
-  columns = sep.split( line.rstrip("\n") )
-  try:
-    price_str = columns[2]
-    price     = int_ruby_style( price_str )
-    category  = columns[3] if len( columns ) >= 4 else ''
-    file_name = fileinput.filename()
-    line_no   = fileinput.filelineno()
-  except IndexError, ValueError:
-    warn_file_format( result_out, line, file_name, line_no )
-    continue
-    
-  if price <= 0:
-    warn_file_format( result_out, line, file_name, line_no )
+with warnings.catch_warnings( MalformedItem ) as w:
+  for item in CashbookItem.generate_no_date(
+      fileinput.input( file_list, openhook=utf8_hook )
+    ):
+    if item.price.income:
+      incomes[ category ] = \
+          incomes.get( category, 0 ) + item.price.value
+      income_sum +=  item.price.value
+    else:
+      expenses[ category ] = \
+          expenses.get( category, 0 ) + item.price.value
+      expense_sum += item.price.value
 
-  if price_str.startswith('+'):
-    income += price
-  else:
-    sums_by_categories[ category ] = \
-        sums_by_categories.get( category, 0 ) + price
-    expense += price
-
-total_str = str( income - expense )
+total_str = str( income_sum - expense_sum )
 
 #To format the result
-income_str    = str( income )
-expense_str   = str( expense )
+income_str    = str( income_sum )
+expense_str   = str( expense_sum )
 income_digit  = len( income_str )
 expense_digit = len( expense_str )
 digit = expense_digit if expense_digit > income_digit else income_digit
