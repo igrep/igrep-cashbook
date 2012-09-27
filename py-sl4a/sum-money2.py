@@ -43,9 +43,10 @@ class CashbookItem(object):
     msg = cause + " from \"" + line + "\""
     raise MalformedItemError( msg )
 
-class MalformedItemError(Error):
+class MalformedItemError(Exception):
   """representing invalid input"""
-  pass
+  def __init__(self, cause):
+    self.cause = cause
 
 class Price(object):
   """representing the price field of the CashbookItem."""
@@ -67,7 +68,7 @@ class Price(object):
     self.income = 0 == len( mdat('sign') )
     self.value = int( mdat( 'digit1' ) + mdat( 'digit2' ) )
 
-class InvalidPriceError(Error):
+class InvalidPriceError(Exception):
   """representing invalid price"""
   pass
 
@@ -112,7 +113,7 @@ for line in fileinput.input( file_list, openhook=utf8_hook ):
   except MalformedItemError as err:
     print >>result_out, \
         u"[WARNING] {0} at {1} of {2}.".format(
-            ''.join( err.args ), line_no, file_name )
+            err.args, line_no, file_name )
     next
   next if item == None
   if item.price.income:
