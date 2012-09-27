@@ -139,16 +139,19 @@ def format_result_line( category, price ):
   width = 10 - len( JP_TOKEN.findall( category ) )
   return u"{0:<{1}}{2:>{3}}".format( category, width, price, digit )
 
-sorted_categories = sorted( sums_by_categories.keys(),
-    key=lambda category: sums_by_categories[ category ] )
-for category in sorted_categories:
-  print >>result_out, \
-    format_result_line( category, sums_by_categories[ category ] )
+def print_sums( header, sums_by_categories, whole_sum ):
+  print >>result_out, header
+  sorted_categories = sorted( sums_by_categories.keys(),
+      key=lambda category: sums_by_categories[ category ] )
+  for category in sorted_categories:
+    print >>result_out, \
+      format_result_line( category, sums_by_categories[ category ] )
+  print >>result_out, format_result_line( u"支出", whole_sum )
+  print >>result_out, "\n",
 
-print >>result_out, format_result_line( u"支出", expense_str )
-if income > 0:
-  print >>result_out, format_result_line( u"収入", income_str )
-  print >>result_out, format_result_line( u"合計", total_str )
+print_sums( '## EXPENSES ##', expenses, expense_sum )
+print_sums( '## INCOMES ##', incomes, income_sum )
+print >>result_out, format_result_line( u"合計", total_str )
 
 if by_android:
   droid.dialogCreateAlert(
