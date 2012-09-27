@@ -51,23 +51,19 @@ class MalformedItemError(Exception):
 class Price(object):
   """representing the price field of the CashbookItem."""
 
-  # fix! seems wrong
   price_re = re.compile( r"""
-      ^(P<sign>\+)?
-      (P<digit1>[1-9])
-      (?:
-        [_,] |
-        (P<digit2>[0-9])
-      )*$
+      ^(\+?)
+      [1-9]
+      [_,\d]
+      *$
       """, re.VERBOSE )
 
   def __init__(self, signed_price):
     mdat = price_re.match(signed_price)
     if mdat == None:
       raise InvalidPriceError
-    # extract from match object
-    self.income = 0 == len( mdat('sign') )
-    self.value = int( mdat( 'digit1' ) + mdat( 'digit2' ) )
+    self.income = 1 == len( mdat.group(0) )
+    self.value = int( filter( lambda x: x in '1234567890', signed_price ) )
 
 class InvalidPriceError(Exception):
   """representing invalid price"""
