@@ -8,9 +8,9 @@ import os.path
 class CashbookItem(object):
 
   #to parse content of a file
-  comment_token = '#'
-  date_re       = re.compile( r'^(\d\d/)?\d\d/\d\d$' )
-  sep           = re.compile( r' {2,}' )
+  COMMENT_TOKEN = '#'
+  DATE_RE       = re.compile( r'^(\d\d/)?\d\d/\d\d$' )
+  SEP           = re.compile( r' {2,}' )
 
   def __init__(self, name, price, group, date = None):
     self.name  = name
@@ -21,19 +21,19 @@ class CashbookItem(object):
   @classmethod
   def parse_line(klass, line):
     """parse a line"""
-    if line.startswith( comment_token ) or date_re.match( line ):
+    if line.startswith( klass.COMMENT_TOKEN ) or klass.DATE_RE.match( line ):
       return None
 
-    columns = sep.split( line.strip() )
+    columns = klass.SEP.split( line.strip() )
     try:
       name      = columns[0]
       price_str = columns[1]
       price     = Price( price_str )
       category  = columns[2]
     except IndexError:
-      raise_with_line( "Invalid line: Some fields are missing", line )
+      klass.raise_with_line( "Invalid line: Some fields are missing", line )
     except InvalidPriceError:
-      raise_with_line( "Invalid line: The price fileld is not valid", line )
+      klass.raise_with_line( "Invalid line: The price fileld is not valid", line )
     else:
       return klass(name, price, group)
 
@@ -51,7 +51,7 @@ class MalformedItemError(Exception):
 class Price(object):
   """representing the price field of the CashbookItem."""
 
-  price_re = re.compile( r"""
+  PRICE_RE = re.compile( r"""
       ^(\+?)
       [1-9]
       [_,\d]
@@ -59,7 +59,7 @@ class Price(object):
       """, re.VERBOSE )
 
   def __init__(self, signed_price):
-    mdat = price_re.match(signed_price)
+    mdat = self.PRICE_RE.match(signed_price)
     if mdat == None:
       raise InvalidPriceError
     self.income = 1 == len( mdat.group(0) )
