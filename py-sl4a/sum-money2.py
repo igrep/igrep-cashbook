@@ -21,7 +21,7 @@ class CashbookItem(object):
   @classmethod
   def parse_line(klass, line):
     """parse a line"""
-    if line.starts_with( comment_token ) || date_re.match( line ):
+    if line.startswith( comment_token ) or date_re.match( line ):
       return None
 
     columns = sep.split( line.strip() )
@@ -111,9 +111,9 @@ for line in fileinput.input( file_list, openhook=utf8_hook ):
     print >>result_out, \
         u"[WARNING] {0} at {1} of {2}.".format(
             err.cause, line_no, file_name )
-    next
+    continue
 
-  next if item == None
+  if item == None: continue
 
   if item.price.income:
     incomes[ category ] = \
