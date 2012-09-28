@@ -110,7 +110,7 @@ for line in fileinput.input( file_list, openhook=utf8_hook ):
   except MalformedItemError as err:
     print >>result_out, \
         u"[WARNING] {0} at {1} of {2}.".format(
-            err.cause, line_no, file_name )
+            err.cause, fileinput.filelineno(), fileinput.filename() )
     continue
 
   if item == None: continue
