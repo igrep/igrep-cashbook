@@ -29,7 +29,7 @@ class CashbookItem(object):
       name      = columns[0]
       price_str = columns[1]
       price     = Price( price_str )
-      category  = columns[2]
+      group     = columns[2]
     except IndexError:
       klass.raise_with_line( "Invalid line: Some fields are missing", line )
     except InvalidPriceError:
@@ -62,7 +62,7 @@ class Price(object):
     mdat = self.PRICE_RE.match(signed_price)
     if mdat == None:
       raise InvalidPriceError
-    self.income = 1 == len( mdat.group(0) )
+    self.income = 1 == len( mdat.group(1) )
     self.value = int( filter( lambda x: x in '1234567890', signed_price ) )
 
 class InvalidPriceError(Exception):
@@ -115,13 +115,14 @@ for line in fileinput.input( file_list, openhook=utf8_hook ):
 
   if item == None: continue
 
+  group = item.group
   if item.price.income:
-    incomes[ category ] = \
-        incomes.get( category, 0 ) + item.price.value
+    incomes[ group ] = \
+        incomes.get( group, 0 ) + item.price.value
     income_sum +=  item.price.value
   else:
-    expenses[ category ] = \
-        expenses.get( category, 0 ) + item.price.value
+    expenses[ group ] = \
+        expenses.get( group, 0 ) + item.price.value
     expense_sum += item.price.value
 
 total_str = str( income_sum - expense_sum )
@@ -133,19 +134,18 @@ income_digit  = len( income_str )
 expense_digit = len( expense_str )
 digit = expense_digit if expense_digit > income_digit else income_digit
 JP_TOKEN = re.compile(u"[一-龠]|[ぁ-ん]|[ァ-ヴ]")
-def format_result_line( category, price ):
+def format_result_line( group, price ):
   #日本語の文字数分だけ寄せる幅が減る。
   #(日本語1文字毎に1つ余計にスペースを使うので)
-  width = 10 - len( JP_TOKEN.findall( category ) )
-  return u"{0:<{1}}{2:>{3}}".format( category, width, price, digit )
+  width = 10 - len( JP_TOKEN.findall( group ) )
+  return u"{0:<{1}}{2:>{3}}".format( group, width, price, digit )
 
-def print_sums( header, sums_by_categories, whole_sum ):
+def print_sums( header, sums, whole_sum ):
   print >>result_out, header
-  sorted_categories = sorted( sums_by_categories.keys(),
-      key=lambda category: sums_by_categories[ category ] )
-  for category in sorted_categories:
+  sorted_groups = sorted( sums.keys(), key=lambda group: sums[ group ] )
+  for group in sorted_groups:
     print >>result_out, \
-      format_result_line( category, sums_by_categories[ category ] )
+      format_result_line( group, sums[ group ] )
   print >>result_out, format_result_line( u"支出", whole_sum )
   print >>result_out, "\n",
 
