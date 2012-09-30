@@ -146,7 +146,7 @@ def print_sums( header, sums, whole_sum ):
   for group in sorted_groups:
     print >>result_out, \
       format_result_line( group, sums[ group ] )
-  print >>result_out, format_result_line( u"支出", whole_sum )
+  print >>result_out, format_result_line( u"小計", whole_sum )
   print >>result_out, "\n",
 
 print_sums( '## EXPENSES ##', expenses, expense_sum )
