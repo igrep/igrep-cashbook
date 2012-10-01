@@ -136,14 +136,15 @@ for line in fileinput.input( file_list, openhook=utf8_hook ):
   if item == None: continue
 
   group = item.group
-  if item.price.income:
+  price = item.price
+  if item.is_income():
     incomes[ group ] = \
-        incomes.get( group, 0 ) + item.price.value
-    income_sum +=  item.price.value
+        incomes.get( group, 0 ) + price
+    income_sum +=  price
   else:
     expenses[ group ] = \
-        expenses.get( group, 0 ) + item.price.value
-    expense_sum += item.price.value
+        expenses.get( group, 0 ) + price
+    expense_sum += price
 
 total_str = str( income_sum - expense_sum )
 
