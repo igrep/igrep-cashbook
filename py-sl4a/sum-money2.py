@@ -76,8 +76,14 @@ class Price(object):
     mdat = self.PRICE_RE.match(signed_price)
     if mdat == None:
       raise InvalidPriceError
-    self.income = 1 == len( mdat.group(1) )
-    self.value = int( filter( lambda x: x in '1234567890', signed_price ) )
+    self._income = 1 == len( mdat.group(1) )
+    self._value = int( filter( lambda x: x in '1234567890', signed_price ) )
+
+  @property
+  def value(self): return self._value
+
+  @property
+  def income(self): return self._income
 
 class InvalidPriceError(Exception):
   """representing invalid price"""
