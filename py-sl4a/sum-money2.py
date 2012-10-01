@@ -13,10 +13,24 @@ class CashbookItem(object):
   SEP           = re.compile( r' {2,}' )
 
   def __init__(self, name, price, group, date = None):
-    self.name  = name
-    self.price = price
-    self.group = group
-    self.date  = date
+    self._name  = name
+    self._price = price
+    self._group = group
+    self._date  = date
+
+  @property
+  def name(self): return self._name
+
+  @property
+  def group(self): return self._group
+
+  @property
+  def date(self): return self._date
+
+  @property
+  def price(self): return self._price.value
+
+  def is_income(self): return self._price.income
 
   @classmethod
   def parse_line(klass, line):
