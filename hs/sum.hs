@@ -74,10 +74,12 @@ main = do
   let sumDigit = max (digit exSum) (digit inSum) 
   let groupLen = 8 -- fixed so far
 
-  putStrLn "# 支出 #"
+  putStrLn "## EXPENDITURES ##"
   putStr   $ formatSummary groupLen sumDigit exSummary
-  putStr   $ formatSumItem groupLen sumDigit "合計" exSum
-  putStrLn "# 収入 #"
+  putStr   $ formatSumItem groupLen sumDigit "小計" exSum
+  putStr "\n"
+  putStrLn "#### INCOMES ####"
   putStr   $ formatSummary groupLen sumDigit inSummary
-  putStr   $ formatSumItem groupLen sumDigit "合計" inSum
-  putStr   $ formatSumItem groupLen sumDigit "総合計" wholeSum
+  putStr   $ formatSumItem groupLen sumDigit "小計" inSum
+  putStr "\n"
+  putStr   $ formatSumItem groupLen sumDigit "合計" wholeSum

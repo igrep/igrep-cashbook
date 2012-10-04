@@ -3,7 +3,7 @@ OPTS = ''
 INSTALL_ROOT = File.join ENV["HOME"], 'my', 'money'
 
 INSTALL_DIRS = {
-  "sum" => 'new',
+  "convert-to-cashbook2" => 'old',
 }
 
 if ENV['SRC']
@@ -18,7 +18,7 @@ INSTALL_DIR = File.join INSTALL_ROOT, INSTALL_DIRS[PROGRAM].to_s
 
 INSTALL_TO = File.join(
   INSTALL_DIR,
-  PROGRAM + '.hs'
+  PROGRAM
 )
 
 task :default => PROGRAM
