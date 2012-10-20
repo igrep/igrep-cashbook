@@ -10,6 +10,7 @@ where
 
 import qualified IgrepCashbook as Old ( Item, isCommentLine, parseItemLine )
 import Data.String.Utils (join)
+import Data.Char (isDigit)
 import Text.Regex.Posix
 
 data CashbookLine =
@@ -78,8 +79,7 @@ mkItem d n s g = Item d n p ip g
     ip = isIncomePrice s
 
     mkPrice :: String -> Int
-    mkPrice x = read $ filter isNumberChar x
-    isNumberChar x = x `elem` ['0'..'9']
+    mkPrice x = read $ filter isDigit x
 
 isIncomePrice :: String -> Bool
 isIncomePrice s = ( s !! 0 ) == '+'
