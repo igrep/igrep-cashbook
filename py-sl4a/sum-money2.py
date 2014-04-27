@@ -54,7 +54,7 @@ class CashbookItem(object):
   @classmethod
   def raise_with_line(klass, cause, line):
     """raise for a malformed line"""
-    msg = cause + " from \"" + line + "\""
+    msg = cause + ": \"" + line + "\""
     raise MalformedItemError( msg )
 
 class MalformedItemError(Exception):
@@ -104,9 +104,20 @@ if by_android:
 
   # choose files to calculate
   import glob
-  money_dir = '/mnt/sdcard/My/money/'
+  money_dirs = [ '/storage/sdcard1/My/money/', '/mnt/sdcard/My/money/' ]
   default_pattern = '[0-9][0-9]-[0-9][0-9].txt'
-  default_file = os.path.basename( max( glob.glob( money_dir + default_pattern ) ) )
+
+  ## collect cash book file paths.
+  cash_books = [
+    glob.glob( d + default_pattern ) for d in money_dirs
+  ]
+
+  ## select a directory which contains cash book files.
+  present_cash_books, money_dir = [
+    ( cash_books[i], d ) for i, d in enumerate( money_dirs ) if cash_books[i]
+  ][0]
+
+  default_file = os.path.basename( max( present_cash_books ) )
   file_pattern = droid.dialogGetInput('ARGV:', 'Enter file pattern.', default_file ).result
   file_list = glob.glob( money_dir + file_pattern )
 
@@ -158,7 +169,9 @@ JP_TOKEN = re.compile(u"[一-龠]|[ぁ-ん]|[ァ-ヴ]")
 def format_result_line( group, price ):
   #日本語の文字数分だけ寄せる幅が減る。
   #(日本語1文字毎に1つ余計にスペースを使うので)
-  width = 10 - len( JP_TOKEN.findall( group ) )
+  extra_width = len( JP_TOKEN.findall( group ) )
+  max_width = 10
+  width = (max_width - extra_width) if extra_width <= max_width else max_width
   return u"{0:<{1}}{2:>{3}}".format( group, width, price, digit )
 
 def print_sums( header, sums, whole_sum ):
