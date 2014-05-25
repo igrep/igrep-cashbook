@@ -3,8 +3,8 @@ import Data.Char
 import System.IO
 import System.Environment
 import Control.Monad
-import qualified Data.Map as Map
-import Data.Map ( Map )
+import qualified Data.Map.Strict as Map
+import Data.Map.Strict ( Map )
 import qualified Data.Text as Text
 import Data.Text ( Text )
 import Data.Either (partitionEithers)
