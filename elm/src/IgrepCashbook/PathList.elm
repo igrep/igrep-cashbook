@@ -5,7 +5,7 @@ module IgrepCashbook.PathList
   , extractFromHtml
   ) where
 
-import List exposing (map, filter, head)
+import List exposing (map, filterMap, head)
 import Maybe
 import Regex exposing (regex, find, HowMany(..))
 import Result
@@ -73,8 +73,7 @@ view a m =
 extractFromHtml : String -> List String
 extractFromHtml =
     find All (regex "href=\"(\\d\\d-\\d\\d\\-?.txt)\"")
-      >> map ((.submatches) >> head >> unwrap >> Maybe.withDefault "")
-      >> filter (not << String.isEmpty)
+      >> filterMap ((.submatches) >> head >> unwrap)
 
 
 unwrap : Maybe (Maybe a) -> Maybe a
