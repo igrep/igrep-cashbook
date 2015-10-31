@@ -5,12 +5,13 @@ module IgrepCashbook.PathList
   , extractFromHtml
   ) where
 
-import Regex exposing (regex, find, HowMany(..))
 import List exposing (map, filter, head)
-import String
 import Maybe
-import Task exposing (onError, succeed)
+import Regex exposing (regex, find, HowMany(..))
+import Result
+import String
 import Signal
+import Task exposing (onError, succeed)
 
 import Html exposing (..)
 import Effects exposing (Effects, Never)
@@ -19,13 +20,16 @@ import Http
 import Debug exposing (log)
 
 
-type alias Model =
+type alias PathList =
   { paths : List String
   }
 
 
+type alias Model = Result String PathList
+
+
 init : (Model, Effects Action)
-init = ( Model [], initialFetch )
+init = ( Result.Err loading, initialFetch )
 
 
 type Action = Replace (List String)
@@ -35,7 +39,9 @@ update : Action -> Model -> (Model, Effects Action)
 update a m =
   case a of
     Replace ss ->
-      ( Model ss, Effects.none )
+      if List.isEmpty ss
+      then ( Result.Err noDefaultPath, Effects.none )
+      else ( Result.Ok (PathList ss), Effects.none )
 
 
 initialFetch : Effects Action
@@ -48,7 +54,11 @@ initialFetch =
 
 view : Signal.Address Action -> Model -> Html
 view a m =
-  ul [] (map (li [] << singleton << text) m.paths)
+  case m of
+    Result.Ok p ->
+      ul [] <| map (li [] << singleton << text) p.paths
+    Result.Err s ->
+      div [] [text s]
 
 
 {-| Get a list of IgrepCashbook file names from an HTML String returned by a file server.
@@ -77,3 +87,15 @@ unwrap m =
 singleton : a -> List a
 -- singleton = (::[])
 singleton x = [x]
+
+noDefaultPath : String
+noDefaultPath =
+  """
+  No default cashbook files found.
+  Seems here isn't a cashbook directory and/or
+  you haven't lanched a web server there.
+  """
+
+
+loading : String
+loading = "Loading cashbook files..."
