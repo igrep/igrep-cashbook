@@ -4,11 +4,11 @@ import ElmTest.Test exposing (test, Test, suite)
 import ElmTest.Assertion exposing (assert, assertEqual)
 import ElmTest.Runner.Element exposing (runDisplay)
 
-import IgrepCashbook.PathList exposing (extractFromHtml)
+import IgrepCashbook.FileList exposing (extractFromHtml)
 
 main : Element
 main = runDisplay <| suite "IgrepCashbook"
-  [ suite ".PathList" <|
+  [ suite ".FileList" <|
     [ suite ".extractFromHtml" <|
       [ test "parses html returned by wai-app-static server" <|
         assertEqual (extractFromHtml htmlFromWarp) expectedPaths

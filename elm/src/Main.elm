@@ -1,6 +1,6 @@
 module Main where
 
-import IgrepCashbook.PathList
+import IgrepCashbook.FileList
 
 import Effects exposing (Never)
 import Task exposing (Task)
@@ -9,9 +9,9 @@ import Signal
 import StartApp
 
 app = StartApp.start
-  { init = IgrepCashbook.PathList.init
-  , update = IgrepCashbook.PathList.update
-  , view = IgrepCashbook.PathList.view
+  { init = IgrepCashbook.FileList.init
+  , update = IgrepCashbook.FileList.update
+  , view = IgrepCashbook.FileList.view
   , inputs = []
   }
 

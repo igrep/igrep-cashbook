@@ -1,14 +1,15 @@
-module IgrepCashbook.PathList
+module IgrepCashbook.FileList
   ( init
   , update
   , view
   , extractFromHtml
   ) where
 
+import IgrepCashbook.File
+
 import List exposing (map, filterMap, head)
 import Maybe
 import Regex exposing (regex, find, HowMany(..))
-import Result
 import String
 import Signal
 import Task exposing (onError, succeed)
@@ -20,16 +21,16 @@ import Http
 import Debug exposing (log)
 
 
-type alias PathList =
-  { paths : List String
+type alias FileList =
+  { files : List IgrepCashbook.File.Model
   }
 
 
-type alias Model = Result String PathList
+type alias Model = Result String FileList
 
 
 init : (Model, Effects Action)
-init = ( Result.Err loading, initialFetch )
+init = ( Err loading, initialFetch )
 
 
 type Action = Replace (List String)
@@ -40,8 +41,10 @@ update a m =
   case a of
     Replace ss ->
       if List.isEmpty ss
-      then ( Result.Err noDefaultPath, Effects.none )
-      else ( Result.Ok (PathList ss), Effects.none )
+      then ( Err noDefaultPath, Effects.none )
+      else
+        ( Ok (FileList <| map IgrepCashbook.File.init ss)
+        , Effects.none )
 
 
 initialFetch : Effects Action
@@ -55,9 +58,9 @@ initialFetch =
 view : Signal.Address Action -> Model -> Html
 view a m =
   case m of
-    Result.Ok p ->
-      ul [] <| map (li [] << singleton << text) p.paths
-    Result.Err s ->
+    Ok p ->
+      ul [] <| map (li [] << singleton << text << (.name)) p.files
+    Err s ->
       div [] [text s]
 
 
