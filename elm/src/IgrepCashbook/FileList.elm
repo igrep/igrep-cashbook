@@ -7,6 +7,7 @@ module IgrepCashbook.FileList
 
 import IgrepCashbook.File
 
+import Dict exposing (Dict)
 import List exposing (map, filterMap, head)
 import Maybe
 import Regex exposing (regex, find, HowMany(..))
@@ -22,7 +23,7 @@ import Debug exposing (log)
 
 
 type alias FileList =
-  { files : List IgrepCashbook.File.Model
+  { files : Dict String IgrepCashbook.File.Model
   }
 
 
@@ -43,8 +44,12 @@ update a m =
       if List.isEmpty ss
       then ( Err noDefaultPath, Effects.none )
       else
-        ( Ok (FileList <| map IgrepCashbook.File.init ss)
-        , Effects.none )
+        ( Ok <|
+          FileList <|
+            Dict.fromList <|
+              map (\s -> ( s, IgrepCashbook.File.init s )) ss
+        , Effects.none
+        )
 
 
 initialFetch : Effects Action
@@ -59,7 +64,7 @@ view : Signal.Address Action -> Model -> Html
 view a m =
   case m of
     Ok p ->
-      ul [] <| map (li [] << singleton << text << (.name)) p.files
+      ul [] <| map (li [] << singleton << text) <| Dict.keys p.files
     Err s ->
       div [] [text s]
 
