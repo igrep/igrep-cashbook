@@ -6,7 +6,6 @@
   "source-directories": ["src", "test"],
   "exposed-modules": [],
   "exposed-modules": [],
-  "native-modules": true,
   "dependencies": {
     "elm-lang/core": "2.0.1 <= v < 3.0.0",
     "evancz/elm-effects": "2.0.0 <= v < 3.0.0",
