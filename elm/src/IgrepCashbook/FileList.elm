@@ -1,11 +1,15 @@
 module IgrepCashbook.FileList
-  ( init
+  ( Model
+  , init
+  , Action(..)
   , update
   , view
   , extractFromHtml
+  , latestFileNameOf
+  , collectSelectedFiles
   ) where
 
-import IgrepCashbook.File
+import IgrepCashbook.File as File
 
 import Dict exposing (Dict)
 import List exposing (map, filterMap, head)
@@ -19,49 +23,51 @@ import Html exposing (..)
 import Effects exposing (Effects, Never)
 import Http
 
-import Debug exposing (log)
+import Debug exposing (log, crash)
 
 
 type alias FileList =
-  { files : Dict String IgrepCashbook.File.Model
+  { files : Dict String File.Model
   }
 
 
 type alias Model = Result String FileList
 
 
-init : (Model, Effects Action)
-init = ( Err loading, initialFetch )
+init : Model
+init = Err loading
 
 
-type Action = Replace (List String)
+type Action = ReplaceByData String | ParseAndSet String String
 
 
-update : Action -> Model -> (Model, Effects Action)
+update : Action -> Model -> Model
 update a m =
   case a of
-    Replace ss ->
-      if List.isEmpty ss
-      then ( Err noDefaultPath, Effects.none )
+    ReplaceByData data ->
+      if String.isEmpty data
+      then
+        Err noDefaultPath
       else
-        ( Ok <|
-          FileList <|
-            Dict.fromList <|
-              map (\s -> ( s, IgrepCashbook.File.init s )) ss
-        , Effects.none
-        )
+        let fileNames = extractFromHtml data
+            fileNameAndFiles =
+              map (\fileName -> ( fileName, File.init fileName )) fileNames
+        in
+        Ok <| FileList <| Dict.fromList fileNameAndFiles
+    ParseAndSet fileName data ->
+      case m of
+        Ok fileList ->
+          Ok <|
+            { fileList
+            | files <-
+              Dict.insert fileName (File.parse fileName data) fileList.files
+            }
+        Err e ->
+          crash <| "Assertion Failure: " ++ e
 
 
-initialFetch : Effects Action
-initialFetch =
-  Http.getString "/"
-      `onError` (\e -> let _ = log "ERROR" e in succeed "")
-    |> Task.map (Replace << extractFromHtml)
-    |> Effects.task
-
-
-view : Signal.Address Action -> Model -> Html
-view a m =
+view : Model -> Html
+view m =
   case m of
     Ok p ->
       ul [] <| map (li [] << singleton << text) <| Dict.keys p.files
@@ -82,6 +88,16 @@ extractFromHtml : String -> List String
 extractFromHtml =
     find All (regex "href=\"(\\d\\d-\\d\\d\\-?.txt)\"")
       >> filterMap ((.submatches) >> head >> unwrap)
+
+
+-- TODO: implement
+latestFileNameOf : Model -> String
+latestFileNameOf ss = ""
+
+
+-- TODO: implement
+collectSelectedFiles : Model -> List File.Model
+collectSelectedFiles m = []
 
 
 unwrap : Maybe (Maybe a) -> Maybe a

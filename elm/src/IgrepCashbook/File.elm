@@ -21,5 +21,10 @@ init : String -> Model
 init s = Model s []
 
 
-parse : String -> List Line.Model
-parse _ = []
+parse : String -> String -> Model
+parse fileName data = Model fileName <| parseLines data
+
+
+-- TODO: implement
+parseLines : String -> List Line.Model
+parseLines _ = []
