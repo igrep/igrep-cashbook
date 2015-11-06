@@ -6,7 +6,7 @@ module IgrepCashbook.FileList
   , view
   , extractFromHtml
   , latestFileNameOf
-  , collectSelectedFiles
+  , collectCalculatedFiles
   ) where
 
 import IgrepCashbook.File as File
@@ -95,9 +95,13 @@ latestFileNameOf : Model -> String
 latestFileNameOf ss = ""
 
 
--- TODO: implement
-collectSelectedFiles : Model -> List File.Model
-collectSelectedFiles m = []
+collectCalculatedFiles : Model -> List File.Model
+collectCalculatedFiles m =
+  case m of
+    Ok fileList ->
+      fileList.files |> Dict.values |> List.filter File.isCalculated
+    Err _ ->
+      []
 
 
 unwrap : Maybe (Maybe a) -> Maybe a

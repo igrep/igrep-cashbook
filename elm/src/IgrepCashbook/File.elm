@@ -2,6 +2,7 @@ module IgrepCashbook.File
   ( init
   -- , update
   , parse
+  , isCalculated
   , Model
   ) where
 
@@ -28,3 +29,7 @@ parse fileName data = Model fileName <| parseLines data
 -- TODO: implement
 parseLines : String -> List Line.Model
 parseLines _ = []
+
+
+isCalculated : Model -> Bool
+isCalculated = (.items) >> (not << List.isEmpty)

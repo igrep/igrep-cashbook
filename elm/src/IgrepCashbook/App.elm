@@ -44,7 +44,7 @@ update a m =
     FetchCashbookData fileName s ->
       ( { m
           | fileList <- FileList.update ( FileList.ParseAndSet fileName s ) m.fileList
-          , summary <- Summary.calculate <| FileList.collectSelectedFiles m.fileList
+          , summary <- Summary.calculate <| FileList.collectCalculatedFiles m.fileList
         }
       , Effects.none
       )
