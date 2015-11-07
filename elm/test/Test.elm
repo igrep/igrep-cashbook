@@ -4,21 +4,22 @@ import ElmTest.Test exposing (test, Test, suite)
 import ElmTest.Assertion exposing (assert, assertEqual)
 import ElmTest.Runner.Element exposing (runDisplay)
 
-import IgrepCashbook.FileList exposing (extractFromHtml)
+import IgrepCashbook.FileList as FileList
 
 main : Element
 main = runDisplay <| suite "IgrepCashbook"
   [ suite ".FileList" <|
     [ suite ".extractFromHtml" <|
       [ test "parses html returned by wai-app-static server" <|
-        assertEqual (extractFromHtml htmlFromWarp) expectedPaths
+        assertEqual (FileList.extractFromHtml htmlFromWarp) expectedPaths
       , test "parses html returned by elm-reactor" <|
-        assertEqual (extractFromHtml htmlFromElmReactor) expectedPaths
+        assertEqual (FileList.extractFromHtml htmlFromElmReactor) expectedPaths
       , test "parses html returned by lighttpd" <|
-        assertEqual (extractFromHtml htmlFromLighttpd) expectedPaths
+        assertEqual (FileList.extractFromHtml htmlFromLighttpd) expectedPaths
       ]
     ]
   ]
+
 
 expectedPaths : List String
 expectedPaths =
@@ -30,6 +31,7 @@ expectedPaths =
   , "15-10.txt"
   , "15-11-.txt"
   ]
+
 
 htmlFromWarp : String
 htmlFromWarp = """
@@ -48,6 +50,7 @@ img { width: 20px }
 a { text-decoration: none }
 </style></head><body><h1>root</h1><table><thead><th class="first"><img src=".hidden/haskell.png"></th><th>Name</th><th>Modified</th><th>Size</th></thead><tbody><tr><td class="first"><img src=".hidden/folder.png" alt="Folder"></td><td><a href="10">10</a></td><td class="date"></td><td class="size"></td></tr><tr class="alt"><td class="first"><img src=".hidden/folder.png" alt="Folder"></td><td><a href="11">11</a></td><td class="date"></td><td class="size"></td></tr><tr><td class="first"><img src=".hidden/folder.png" alt="Folder"></td><td><a href="12">12</a></td><td class="date"></td><td class="size"></td></tr><tr class="alt"><td class="first"><img src=".hidden/folder.png" alt="Folder"></td><td><a href="13">13</a></td><td class="date"></td><td class="size"></td></tr><tr><td class="first"><img src=".hidden/folder.png" alt="Folder"></td><td><a href="14">14</a></td><td class="date"></td><td class="size"></td></tr><tr class="alt"><td class="first"><img src=".hidden/folder.png" alt="Folder"></td><td><a href="old">old</a></td><td class="date"></td><td class="size"></td></tr><tr><td class="first"><img src=".hidden/folder.png" alt="Folder"></td><td><a href="payslips">payslips</a></td><td class="date"></td><td class="size"></td></tr><tr class="alt"><td class="first"></td><td><a href="15-05.txt">15-05.txt</a></td><td class="date">16-Jun-2015 14:26:47</td><td class="size">5 KB</td></tr><tr><td class="first"></td><td><a href="15-06.txt">15-06.txt</a></td><td class="date">15-Jul-2015 14:25:40</td><td class="size">3 KB</td></tr><tr class="alt"><td class="first"></td><td><a href="15-07.txt">15-07.txt</a></td><td class="date">27-Sep-2015 10:04:42</td><td class="size">3 KB</td></tr><tr><td class="first"></td><td><a href="15-08.txt">15-08.txt</a></td><td class="date">14-Sep-2015 12:33:41</td><td class="size">3 KB</td></tr><tr class="alt"><td class="first"></td><td><a href="15-09.txt">15-09.txt</a></td><td class="date">13-Oct-2015 12:16:17</td><td class="size">2 KB</td></tr><tr><td class="first"></td><td><a href="15-10.txt">15-10.txt</a></td><td class="date">25-Oct-2015 02:50:44</td><td class="size">2 KB</td></tr><tr class="alt"><td class="first"></td><td><a href="15-11-.txt">15-11-.txt</a></td><td class="date">23-Oct-2015 05:03:09</td><td class="size">961 B</td></tr><tr><td class="first"></td><td><a href="animate-point.txt">animate-point.txt</a></td><td class="date">29-Sep-2013 05:00:14</td><td class="size">2 B</td></tr><tr class="alt"><td class="first"></td><td><a href="hasmoku.txt">hasmoku.txt</a></td><td class="date">31-Jan-2015 14:01:13</td><td class="size">1 KB</td></tr><tr><td class="first"></td><td><a href="pc.txt">pc.txt</a></td><td class="date">30-Mar-2015 13:01:38</td><td class="size">488 B</td></tr><tr class="alt"><td class="first"></td><td><a href="psc.tix">psc.tix</a></td><td class="date">07-Oct-2015 01:41:32</td><td class="size">63 KB</td></tr><tr><td class="first"></td><td><a href="sum">sum</a></td><td class="date">25-May-2014 13:18:27</td><td class="size">2 MB</td></tr><tr class="alt"><td class="first"></td><td><a href="sum-money2.py">sum-money2.py</a></td><td class="date">27-Apr-2014 03:07:49</td><td class="size">5 KB</td></tr><tr><td class="first"></td><td><a href="template.txt">template.txt</a></td><td class="date">23-Oct-2015 04:58:08</td><td class="size">1,004 B</td></tr></tbody></table></body></html>
 """
+
 
 htmlFromElmReactor : String
 htmlFromElmReactor = """
@@ -83,6 +86,7 @@ th {
     font-size: 24px;
 }</style></head><body><div class="topbar"></div><div class="header"><a href="/">~</a> / </div><div class="content"><table><tr><th>Directories</th></tr><tr><td><a href="10/">10</a></td></tr><tr><td><a href="11/">11</a></td></tr><tr><td><a href="12/">12</a></td></tr><tr><td><a href="13/">13</a></td></tr><tr><td><a href="14/">14</a></td></tr><tr><td><a href="old/">old</a></td></tr><tr><td><a href="payslips/">payslips</a></td></tr></table><table><tr><th>Other Files</th><th></th></tr><tr><td><a href="15-05.txt">15-05.txt</a></td><td style="text-align:right;">131 days ago</td></tr><tr><td><a href="15-06.txt">15-06.txt</a></td><td style="text-align:right;">102 days ago</td></tr><tr><td><a href="15-07.txt">15-07.txt</a></td><td style="text-align:right;">28 days ago</td></tr><tr><td><a href="15-08.txt">15-08.txt</a></td><td style="text-align:right;">41 days ago</td></tr><tr><td><a href="15-09.txt">15-09.txt</a></td><td style="text-align:right;">12 days ago</td></tr><tr><td><a href="15-10.txt">15-10.txt</a></td><td style="text-align:right;">10 hours ago</td></tr><tr><td><a href="15-11-.txt">15-11-.txt</a></td><td style="text-align:right;">2 days ago</td></tr><tr><td><a href="animate-point.txt">animate-point.txt</a></td><td style="text-align:right;">2 years ago</td></tr><tr><td><a href="hasmoku.txt">hasmoku.txt</a></td><td style="text-align:right;">267 days ago</td></tr><tr><td><a href="pc.txt">pc.txt</a></td><td style="text-align:right;">209 days ago</td></tr><tr><td><a href="psc.tix">psc.tix</a></td><td style="text-align:right;">18 days ago</td></tr><tr><td><a href="sum">sum</a></td><td style="text-align:right;">1 year ago</td></tr><tr><td><a href="sum-money2.py">sum-money2.py</a></td><td style="text-align:right;">1 year ago</td></tr><tr><td><a href="template.txt">template.txt</a></td><td style="text-align:right;">2 days ago</td></tr></table></div></body></html>
 """
+
 
 htmlFromLighttpd : String
 htmlFromLighttpd = """
