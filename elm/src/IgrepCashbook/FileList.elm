@@ -7,6 +7,7 @@ module IgrepCashbook.FileList
   , extractFromHtml
   , latestFileNameOf
   , collectCalculatedFiles
+  , fromPaths
   ) where
 
 import IgrepCashbook.File as File
@@ -63,7 +64,9 @@ update a m =
               Dict.insert fileName (File.parse fileName data) fileList.files
             }
         Err e ->
-          crash <| "Assertion Failure: " ++ e
+          let _ = log "Assertion failure this should not be executed except in test. The Error was: " e
+          in
+              Ok <| { files = Dict.singleton fileName <| File.parse fileName data }
 
 
 view : Model -> Html
@@ -92,7 +95,16 @@ extractFromHtml =
 
 -- TODO: implement
 latestFileNameOf : Model -> String
-latestFileNameOf ss = ""
+latestFileNameOf m =
+  case m of
+    Ok fileList ->
+      fileList.files
+        |> Dict.keys
+        |> List.filter (not << String.endsWith "-.txt")
+        |> List.maximum
+        |> Maybe.withDefault ""
+    Err _ ->
+      ""
 
 
 collectCalculatedFiles : Model -> List File.Model
@@ -102,6 +114,12 @@ collectCalculatedFiles m =
       fileList.files |> Dict.values |> List.filter File.isCalculated
     Err _ ->
       []
+
+
+-- for testing
+fromPaths : List String -> Model
+fromPaths =
+  List.foldr (\s -> update <| ParseAndSet s "") init
 
 
 unwrap : Maybe (Maybe a) -> Maybe a

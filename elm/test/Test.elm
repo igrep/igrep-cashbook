@@ -6,6 +6,9 @@ import ElmTest.Runner.Element exposing (runDisplay)
 
 import IgrepCashbook.FileList as FileList
 
+import Dict
+
+
 main : Element
 main = runDisplay <| suite "IgrepCashbook"
   [ suite ".FileList" <|
@@ -16,6 +19,28 @@ main = runDisplay <| suite "IgrepCashbook"
         assertEqual (FileList.extractFromHtml htmlFromElmReactor) expectedPaths
       , test "parses html returned by lighttpd" <|
         assertEqual (FileList.extractFromHtml htmlFromLighttpd) expectedPaths
+      ]
+    , suite ".latestFileNameOf" <|
+      [ test
+          "given a file list containing only non-dash-ending file, returns the latest file name."
+          <|
+            let model = FileList.fromPaths ["15-06.txt", "15-07.txt", "15-08.txt"]
+            in
+                assertEqual (FileList.latestFileNameOf model) "15-08.txt"
+      , test
+          "given a file list containing dash-ending file, returns the latest non-dash-ending file name."
+          <|
+            let model = FileList.fromPaths ["15-12.txt", "15-11.txt", "15-10.txt", "15-13-.txt"]
+            in
+                assertEqual (FileList.latestFileNameOf model) "15-12.txt"
+      , test "given an empty file list, returns an empty file name." <|
+        let model = Ok { files = Dict.empty }
+        in
+            assertEqual (FileList.latestFileNameOf model) ""
+      , test "given an error file list, returns an empty file name." <|
+        let model = Err "error"
+        in
+            assertEqual (FileList.latestFileNameOf model) ""
       ]
     ]
   ]
