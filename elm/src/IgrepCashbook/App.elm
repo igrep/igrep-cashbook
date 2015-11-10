@@ -50,21 +50,22 @@ update a m =
       )
 
 
--- TODO: Refactor
 initialFetch : Effects Action
 initialFetch =
-  Http.getString "/"
-      `onError` (\e -> let _ = log "ERROR" e in succeed "")
-    |> Task.map FetchFileListData
-    |> Effects.task
+  fetchFromPathToTask "/" FetchFileListData
 
 
--- TODO: Refactor
+-- TODO: Do something when the file name is empty
 fetchFile : String -> Effects Action
 fetchFile fileName =
-  Http.getString ( "/" ++ fileName )
+  fetchFromPathToTask ( "/" ++ fileName ) ( FetchCashbookData fileName )
+
+
+fetchFromPathToTask : String -> (String -> Action) -> Effects Action
+fetchFromPathToTask path dataToAction =
+  Http.getString path
       `onError` (\e -> let _ = log "ERROR" e in succeed "")
-    |> Task.map (FetchCashbookData fileName)
+    |> Task.map dataToAction
     |> Effects.task
 
 
