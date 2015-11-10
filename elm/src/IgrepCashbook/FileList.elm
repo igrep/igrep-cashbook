@@ -93,7 +93,6 @@ extractFromHtml =
       >> filterMap ((.submatches) >> head >> unwrap)
 
 
--- TODO: implement
 latestFileNameOf : Model -> String
 latestFileNameOf m =
   case m of
