@@ -37,14 +37,14 @@ update a m =
   case a of
     FetchFileListData s ->
       ( { m
-          | fileList <- FileList.update ( FileList.ReplaceByData s ) m.fileList
+          | fileList = FileList.update ( FileList.ReplaceByData s ) m.fileList
         }
       , fetchFile <| FileList.latestFileNameOf m.fileList
       )
     FetchCashbookData fileName s ->
       ( { m
-          | fileList <- FileList.update ( FileList.ParseAndSet fileName s ) m.fileList
-          , summary <- Summary.calculate <| FileList.collectCalculatedFiles m.fileList
+          | fileList = FileList.update ( FileList.ParseAndSet fileName s ) m.fileList
+          , summary = Summary.calculate <| FileList.collectCalculatedFiles m.fileList
         }
       , Effects.none
       )

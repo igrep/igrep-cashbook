@@ -60,7 +60,7 @@ update a m =
         Ok fileList ->
           Ok <|
             { fileList
-            | files <-
+            | files =
               Dict.insert fileName (File.parse fileName data) fileList.files
             }
         Err e ->
