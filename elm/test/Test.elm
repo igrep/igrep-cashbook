@@ -1,8 +1,13 @@
 import Graphics.Element exposing (Element)
 
-import ElmTest.Test exposing (test, Test, suite)
-import ElmTest.Assertion exposing (assert, assertEqual)
-import ElmTest.Runner.Element exposing (runDisplay)
+import ElmTest exposing
+  ( test
+  , Test
+  , suite
+  , assert
+  , assertEqual
+  , elementRunner
+  )
 
 import IgrepCashbook.FileList as FileList
 
@@ -10,7 +15,7 @@ import Dict
 
 
 main : Element
-main = runDisplay <| suite "IgrepCashbook"
+main = elementRunner <| suite "IgrepCashbook"
   [ suite ".FileList" <|
     [ suite ".extractFromHtml" <|
       [ test "parses html returned by wai-app-static server" <|
