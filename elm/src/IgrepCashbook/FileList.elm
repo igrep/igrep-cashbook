@@ -126,7 +126,6 @@ unwrap m =
 
 
 singleton : a -> List a
--- singleton = (::[])
 singleton x = [x]
 
 
