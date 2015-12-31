@@ -3,12 +3,14 @@ module Main where
 import IgrepCashbook.App
 
 import Effects exposing (Never)
+import Html exposing (Html)
 import Task exposing (Task)
 import Signal
 
 import StartApp
 
 
+app : StartApp.App IgrepCashbook.App.Model
 app = StartApp.start
   { init = IgrepCashbook.App.init
   , update = IgrepCashbook.App.update
@@ -17,6 +19,7 @@ app = StartApp.start
   }
 
 
+main : Signal Html
 main = app.html
 
 

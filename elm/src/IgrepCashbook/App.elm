@@ -1,5 +1,6 @@
 module IgrepCashbook.App
-  ( init
+  ( Model
+  , init
   , update
   , view
   ) where
