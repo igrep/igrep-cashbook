@@ -1,8 +1,8 @@
 module IgrepCashbook.FileList
   ( Model
   , init
-  , Action(..)
-  , update
+  , replaceByData
+  , parseAndSet
   , view
   , extractFromHtml
   , latestFileNameOf
@@ -39,34 +39,31 @@ init : Model
 init = Err loading
 
 
-type Action = ReplaceByData String | ParseAndSet String String
+replaceByData : String -> Model -> Model
+replaceByData data m =
+  if String.isEmpty data then
+    Err noDefaultPath
+  else
+    let fileNames = extractFromHtml data
+        fileNameAndFiles =
+          map (\fileName -> (fileName, File.init fileName)) fileNames
+    in
+    Ok <| FileList <| Dict.fromList fileNameAndFiles
 
 
-update : Action -> Model -> Model
-update a m =
-  case a of
-    ReplaceByData data ->
-      if String.isEmpty data
-      then
-        Err noDefaultPath
-      else
-        let fileNames = extractFromHtml data
-            fileNameAndFiles =
-              map (\fileName -> ( fileName, File.init fileName )) fileNames
-        in
-        Ok <| FileList <| Dict.fromList fileNameAndFiles
-    ParseAndSet fileName data ->
-      case m of
-        Ok fileList ->
-          Ok <|
-            { fileList
-            | files =
-              Dict.insert fileName (File.parse fileName data) fileList.files
-            }
-        Err e ->
-          let _ = log "Assertion failure this should not be executed except in test. The Error was: " e
-          in
-              Ok <| { files = Dict.singleton fileName <| File.parse fileName data }
+parseAndSet : String -> String -> Model -> Model
+parseAndSet fileName data m =
+  case m of
+    Ok fileList ->
+      Ok <|
+        { fileList
+        | files =
+          Dict.insert fileName (File.parse fileName data) fileList.files
+        }
+    Err e ->
+      let _ = log "Assertion failure this should not be executed except in test. The Error was: " e
+      in
+          Ok <| { files = Dict.singleton fileName <| File.parse fileName data }
 
 
 view : Model -> Html
@@ -118,7 +115,7 @@ collectCalculatedFiles m =
 -- for testing
 fromPaths : List String -> Model
 fromPaths =
-  List.foldr (\s -> update <| ParseAndSet s "") init
+  List.foldr (\s -> parseAndSet s "") init
 
 
 unwrap : Maybe (Maybe a) -> Maybe a
