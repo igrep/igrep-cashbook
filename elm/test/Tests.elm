@@ -1,3 +1,5 @@
+module Tests where
+
 import Graphics.Element exposing (Element)
 
 import ElmTest exposing
@@ -10,45 +12,60 @@ import ElmTest exposing
   )
 
 import IgrepCashbook.FileList as FileList
+import IgrepCashbook.File as File
+import IgrepCashbook.Line as Line exposing (SuccessLine, WrongLine)
 
 import Dict
 
 
-main : Element
-main = elementRunner <| suite "IgrepCashbook"
-  [ suite ".FileList" <|
-    [ suite ".extractFromHtml" <|
-      [ test "parses html returned by wai-app-static server" <|
-        assertEqual (FileList.extractFromHtml htmlFromWarp) expectedPaths
-      , test "parses html returned by elm-reactor" <|
-        assertEqual (FileList.extractFromHtml htmlFromElmReactor) expectedPaths
-      , test "parses html returned by lighttpd" <|
-        assertEqual (FileList.extractFromHtml htmlFromLighttpd) expectedPaths
+all : Test
+all =
+  suite "IgrepCashbook"
+    [ suite ".FileList"
+      [ suite ".extractFromHtml"
+        [ test "parses html returned by wai-app-static server" <|
+          assertEqual expectedPaths (FileList.extractFromHtml htmlFromWarp)
+        , test "parses html returned by elm-reactor" <|
+          assertEqual expectedPaths (FileList.extractFromHtml htmlFromElmReactor)
+        , test "parses html returned by lighttpd" <|
+          assertEqual expectedPaths (FileList.extractFromHtml htmlFromLighttpd)
+        ]
+      , suite ".latestFileNameOf"
+        [ test
+            "given a file list containing only non-dash-ending file, returns the latest file name."
+            <|
+              let model = FileList.fromPaths ["15-06.txt", "15-07.txt", "15-08.txt"]
+              in
+                  assertEqual "15-08.txt" (FileList.latestFileNameOf model)
+        , test
+            "given a file list containing dash-ending file, returns the latest non-dash-ending file name."
+            <|
+              let model = FileList.fromPaths ["15-12.txt", "15-11.txt", "15-10.txt", "15-13-.txt"]
+              in
+                  assertEqual "15-12.txt" (FileList.latestFileNameOf model)
+        , test "given an empty file list, returns an empty file name." <|
+          let model = Ok { files = Dict.empty }
+          in
+              assertEqual "" (FileList.latestFileNameOf model)
+        , test "given an error file list, returns an empty file name." <|
+          let model = Err "error"
+          in
+              assertEqual "" (FileList.latestFileNameOf model)
+        ]
       ]
-    , suite ".latestFileNameOf" <|
-      [ test
-          "given a file list containing only non-dash-ending file, returns the latest file name."
-          <|
-            let model = FileList.fromPaths ["15-06.txt", "15-07.txt", "15-08.txt"]
-            in
-                assertEqual (FileList.latestFileNameOf model) "15-08.txt"
-      , test
-          "given a file list containing dash-ending file, returns the latest non-dash-ending file name."
-          <|
-            let model = FileList.fromPaths ["15-12.txt", "15-11.txt", "15-10.txt", "15-13-.txt"]
-            in
-                assertEqual (FileList.latestFileNameOf model) "15-12.txt"
-      , test "given an empty file list, returns an empty file name." <|
-        let model = Ok { files = Dict.empty }
-        in
-            assertEqual (FileList.latestFileNameOf model) ""
-      , test "given an error file list, returns an empty file name." <|
-        let model = Err "error"
-        in
-            assertEqual (FileList.latestFileNameOf model) ""
+    , suite ".File"
+      [ suite ".parse"
+        [ test "given lines representing cashbook lines, returns parsed items" <|
+            assertEqual
+              (File.Model "name" exampleLines)
+              (File.parse "name" exampleCashbookData)
+        ]
       ]
     ]
-  ]
+
+
+main : Element
+main = elementRunner all
 
 
 expectedPaths : List String
@@ -60,6 +77,54 @@ expectedPaths =
   , "15-09.txt"
   , "15-10.txt"
   , "15-11-.txt"
+  ]
+
+
+exampleCashbookData : String
+exampleCashbookData = """
+# Comment
+# The line below is date line formatted as YY/MM/DD or MM/DD
+01/02/03
+02/03
+# price field can be separated by comma or underline
+ Salary  +12_300,000  Group1 # plus sign represents an income.
+01/02/03
+ What I bought  2000  Group1 # no sign represents an expense.
+
+# empty lines should be ignored!
+
+01/02/04
+ Other income  +100  Group2
+ Another things I bought  10_000  Group2
+ Yet another income  +10  Group2
+ Yet another things I bought  1000  Group2
+ Wrong line (only 1 space between name and price) 1000  Group2
+ Wrong line (only 1 space between price and group)  1000 Group2
+ Wrong line (no group1)  1000
+ Wrong line (no group2)  1000  
+   1000  NoName
+ Wrong line (price is 0)  0  Group2
+ Wrong line (malformed price)  -0  Group2
+ Wrong line (malformed price)  0+  Group2
+"""
+
+
+exampleLines : List Line.Model
+exampleLines =
+  [ Ok <| SuccessLine 12300000 "Group1"
+  , Ok <| SuccessLine -2000 "Group1"
+  , Ok <| SuccessLine 100 "Group2"
+  , Ok <| SuccessLine -10000 "Group2"
+  , Ok <| SuccessLine 10 "Group2"
+  , Ok <| SuccessLine -1000 "Group2"
+  , Err <| WrongLine Line.errorInvalidPrice          " Wrong line (only 1 space between name and price) 1000  Group2"
+  , Err <| WrongLine Line.errorNoSeparatorAfterPrice " Wrong line (only 1 space between price and group)  1000 Group2"
+  , Err <| WrongLine Line.errorNoSeparatorAfterPrice " Wrong line (no group1)  1000"
+  , Err <| WrongLine Line.errorNoGroup               " Wrong line (no group2)  1000  "
+  , Err <| WrongLine Line.errorNoName                "   1000  NoName"
+  , Err <| WrongLine Line.errorInvalidPrice          " Wrong line (price is 0)  0  Group2"
+  , Err <| WrongLine Line.errorInvalidPrice          " Wrong line (malformed price)  -0  Group2"
+  , Err <| WrongLine Line.errorInvalidPrice          " Wrong line (malformed price)  0+  Group2"
   ]
 
 

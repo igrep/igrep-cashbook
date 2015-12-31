@@ -23,12 +23,12 @@ init s = Model s []
 
 
 parse : String -> String -> Model
-parse fileName data = Model fileName <| parseLines data
+parse fileName = Model fileName << parseToLines
 
 
--- TODO: implement
-parseLines : String -> List Line.Model
-parseLines _ = []
+parseToLines : String -> List Line.Model
+parseToLines =
+  String.split "\n" >> Line.parseList
 
 
 isCalculated : Model -> Bool

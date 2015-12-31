@@ -12,8 +12,8 @@ import Dict exposing (Dict)
 import Html exposing (..)
 
 type alias Model =
-  { expenditures    : Dict String Int
-  , incomes         : Dict String Int
+  { expenditures : Dict String Int
+  , incomes      : Dict String Int
   }
 
 -- TODO: implement
