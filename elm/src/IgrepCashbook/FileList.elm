@@ -24,7 +24,7 @@ import Html exposing (..)
 import Effects exposing (Effects, Never)
 import Http
 
-import Debug exposing (log, crash)
+import Debug exposing (..)
 
 
 type alias FileList =

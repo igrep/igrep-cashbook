@@ -59,7 +59,7 @@ initialFetch =
 -- TODO: Do something when the file name is empty
 fetchFile : String -> Effects Action
 fetchFile fileName =
-  fetchFromPathToTask ( "/" ++ fileName ) ( FetchCashbookData fileName )
+  fetchFromPathToTask ("/" ++ fileName) (FetchCashbookData fileName)
 
 
 fetchFromPathToTask : String -> (String -> Action) -> Effects Action
