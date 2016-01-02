@@ -106,7 +106,7 @@ priceSeparatorRegex =
 unsafeToInt : String -> Int
 unsafeToInt =
   String.toInt
-    >> Result.withDefault 0 --(Debug.crash "Assertion failure: non integer string")
+    >> Result.withDefault 0
 
 
 noSeparator : String -> String
