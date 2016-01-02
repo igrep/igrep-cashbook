@@ -122,7 +122,7 @@ exampleCashbookData = """
 
 exampleFiles : List File.Model
 exampleFiles =
-  [File.parse "file1" exampleCashbookData, File.parse "file1" exampleCashbookData]
+  [File.parse "file1" exampleCashbookData, File.parse "file2" exampleCashbookData]
 
 
 expectedSummary : Summary.Model
