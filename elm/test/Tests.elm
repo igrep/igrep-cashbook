@@ -53,11 +53,12 @@ all =
               assertEqual "" (FileList.latestFileNameOf model)
         ]
       ]
+
     , suite ".File"
       [ suite ".parse"
         [ test "given lines representing cashbook lines, returns parsed items" <|
             assertEqual
-              (File.Model "name" exampleLines)
+              (File.Model "name" expectedLines)
               (File.parse "name" exampleCashbookData)
         ]
       ]
@@ -109,8 +110,8 @@ exampleCashbookData = """
 """
 
 
-exampleLines : List Line.Model
-exampleLines =
+expectedLines : List Line.Model
+expectedLines =
   [ Ok <| SuccessLine 12300000 "Group1"
   , Ok <| SuccessLine -2000 "Group1"
   , Ok <| SuccessLine 100 "Group2"
