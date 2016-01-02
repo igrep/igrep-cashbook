@@ -66,9 +66,7 @@ addLineToSubSummary l s =
 
 priceAppender : Int -> Maybe Int -> Maybe Int
 priceAppender newPrice maybePrice =
-  case maybePrice of
-    Just price -> Just <| newPrice + price
-    Nothing    -> Just <| newPrice
+  Just <| newPrice + (Maybe.withDefault 0 maybePrice)
 
 
 view : Model -> Html
