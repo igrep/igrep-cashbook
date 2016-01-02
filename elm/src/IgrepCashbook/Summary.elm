@@ -74,12 +74,28 @@ view : Model -> Html
 view m =
   div [] <|
     [ h1 [] [text "Expenditures"]
-    , table [] (trsFromSummary m.expenditures)
+    , table [] (trsFromSubSummary m.expenditures)
     , h1 [] [text "Incomes"]
-    , table [] (trsFromSummary m.incomes)
+    , table [] (trsFromSubSummary m.incomes)
+    , h1 [] [text <| "Total: " ++ toString m.total]
     ]
 
 
--- TODO: implement
-trsFromSummary : Dict String Int -> List Html
-trsFromSummary s = []
+trsFromSubSummary : SubSummary -> List Html
+trsFromSubSummary s =
+  (Dict.toList s.breakdown |> List.map toTableRow) ++ [trSubTotal s]
+
+
+trSubTotal : SubSummary -> Html
+trSubTotal s =
+  toTableRow ("Sub Total", s.subTotal)
+
+
+toTableRow : (String, Int) -> Html
+toTableRow (header, value) =
+  tr [] [th [] [text header], td [] [text (toString <| abs value)]]
+
+
+subTotal : SubSummary -> Int
+subTotal =
+  (.breakdown) >> Dict.values >> List.sum
