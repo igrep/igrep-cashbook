@@ -74,7 +74,8 @@ priceAppender newPrice maybePrice =
 view : Model -> Html
 view m =
   div [] <|
-    [ h1 [] [text "Expenditures"]
+    [ Line.viewWrongs m.errors
+    , h1 [] [text "Expenditures"]
     , table [] (trsFromSubSummary m.expenditures)
     , h1 [] [text "Incomes"]
     , table [] (trsFromSubSummary m.incomes)

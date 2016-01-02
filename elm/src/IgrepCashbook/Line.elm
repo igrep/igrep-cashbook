@@ -2,6 +2,7 @@ module IgrepCashbook.Line
   ( Model
   , Success
   , Wrong
+  , viewWrongs
   , parse
   , parseList
   , errorNoName
@@ -15,6 +16,7 @@ import Combine exposing (many1)
 import Combine.Infix exposing (..)
 import Combine.Char exposing (char, space)
 import Debug
+import Html exposing (..)
 import String
 import List
 import Regex exposing (Regex)
@@ -32,6 +34,21 @@ type alias Wrong =
   , content : String
   }
 
+
+viewWrongs : List Wrong -> Html
+viewWrongs wls =
+  if List.isEmpty wls then
+    text ""
+  else
+    div [] <|
+      [ h1 [] [text "Errors"]
+      , ol [] <| List.map liWrong wls
+      ]
+
+
+liWrong : Wrong -> Html
+liWrong wl =
+  li [] [text <| wl.errorMessage ++ ": " ++ toString wl.content]
 
 parseList : List String -> List Model
 parseList =
