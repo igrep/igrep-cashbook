@@ -58,7 +58,7 @@ parseAndSet fileName data m =
       Ok <|
         { fileList
         | files =
-          Dict.insert fileName (File.parse fileName data) fileList.files
+            Dict.insert fileName (File.parse fileName data) fileList.files
         }
     Err e ->
       let _ = log "Assertion failure this should not be executed except in test. The Error was: " e
@@ -70,7 +70,12 @@ view : Model -> Html
 view m =
   case m of
     Ok p ->
-      ul [] <| map (li [] << singleton << text) <| Dict.keys p.files
+      let fileNames = Dict.keys p.files
+      in
+          if List.isEmpty fileNames then
+            div [] [text "No cashbook files found. Isn't this a cashbook file directory?"]
+          else
+            ul [] <| map (li [] << singleton << text) fileNames
     Err s ->
       div [] [text s]
 

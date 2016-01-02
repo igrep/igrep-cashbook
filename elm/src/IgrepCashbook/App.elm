@@ -12,6 +12,7 @@ import Debug exposing (..)
 import Effects exposing (Effects, Never)
 import Html exposing (..)
 import Http
+import String
 import Task exposing (onError, succeed)
 
 
@@ -55,10 +56,14 @@ initialFetch =
   fetchFromPathToTask "/" FetchFileListData
 
 
--- TODO: Do something when the file name is empty
 fetchFile : String -> Effects Action
 fetchFile fileName =
-  fetchFromPathToTask ("/" ++ fileName) (FetchCashbookData fileName)
+  if String.isEmpty fileName then
+    let _ = log "Can't get a cashbook file. Isn't this a cashbook file directory?"
+    in
+        Effects.none
+  else
+    fetchFromPathToTask ("/" ++ fileName) (FetchCashbookData fileName)
 
 
 fetchFromPathToTask : String -> (String -> Action) -> Effects Action
