@@ -1,7 +1,7 @@
 module IgrepCashbook.Line
   ( Model
-  , SuccessLine
-  , WrongLine
+  , Success
+  , Wrong
   , parse
   , parseList
   , errorNoName
@@ -20,14 +20,14 @@ import List
 import Regex exposing (Regex)
 import Result
 
-type alias Model = Result WrongLine SuccessLine
+type alias Model = Result Wrong Success
 
-type alias SuccessLine =
+type alias Success =
   { price : Int
   , group : String
   }
 
-type alias WrongLine =
+type alias Wrong =
   { errorMessage : String
   , content : String
   }
@@ -53,7 +53,7 @@ parse line =
               <$> (Combine.regex "[1-9][_,\\d]*" <?> errorInvalidPrice)
           )
       parser =
-        SuccessLine
+        Success
           <$  nameField
           <*  (twoOrMoreSpaces <?> errorNoSeparatorAfterName)
           <*> priceParser
@@ -65,7 +65,7 @@ parse line =
         Combine.Done successLine ->
           Ok successLine
         Combine.Fail errorMessages ->
-          Err <| WrongLine (String.join ", " errorMessages) line
+          Err <| Wrong (String.join ", " errorMessages) line
 
 
 twoOrMoreSpaces : Combine.Parser ()

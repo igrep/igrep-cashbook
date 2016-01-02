@@ -18,7 +18,7 @@ type alias Model =
   { expenditures : SubSummary
   , incomes      : SubSummary
   , total        : Int
-  , errors       : List Line.WrongLine
+  , errors       : List Line.Wrong
   }
 
 type alias SubSummary =
@@ -59,7 +59,7 @@ addLine l m =
       { m | errors = wl :: m.errors }
 
 
-addLineToSubSummary : Line.SuccessLine -> SubSummary -> SubSummary
+addLineToSubSummary : Line.Success -> SubSummary -> SubSummary
 addLineToSubSummary l s =
   SubSummary
     (Dict.update l.group (priceAppender l.price) s.breakdown)

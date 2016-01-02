@@ -13,7 +13,7 @@ import ElmTest exposing
 
 import IgrepCashbook.FileList as FileList
 import IgrepCashbook.File as File
-import IgrepCashbook.Line as Line exposing (SuccessLine, WrongLine)
+import IgrepCashbook.Line as Line exposing (Success, Wrong)
 import IgrepCashbook.Summary as Summary exposing (SubSummary)
 
 import Dict
@@ -148,25 +148,25 @@ expectedSummary =
 
 expectedLines : List Line.Model
 expectedLines =
-  [ Ok <| SuccessLine 12300000 "Group1"
-  , Ok <| SuccessLine -2000 "Group1"
-  , Ok <| SuccessLine 100 "Group2"
-  , Ok <| SuccessLine -10000 "Group2"
-  , Ok <| SuccessLine 10 "Group2"
-  , Ok <| SuccessLine -1000 "Group2"
+  [ Ok <| Success 12300000 "Group1"
+  , Ok <| Success -2000 "Group1"
+  , Ok <| Success 100 "Group2"
+  , Ok <| Success -10000 "Group2"
+  , Ok <| Success 10 "Group2"
+  , Ok <| Success -1000 "Group2"
   ] ++ List.map Err expectedWrongLines
 
 
-expectedWrongLines : List Line.WrongLine
+expectedWrongLines : List Line.Wrong
 expectedWrongLines =
-  [ WrongLine Line.errorInvalidPrice          " Wrong line (only 1 space between name and price) 1000  Group2"
-  , WrongLine Line.errorNoSeparatorAfterPrice " Wrong line (only 1 space between price and group)  1000 Group2"
-  , WrongLine Line.errorNoSeparatorAfterPrice " Wrong line (no group1)  1000"
-  , WrongLine Line.errorNoGroup               " Wrong line (no group2)  1000  "
-  , WrongLine Line.errorNoName                "   1000  NoName"
-  , WrongLine Line.errorInvalidPrice          " Wrong line (price is 0)  0  Group2"
-  , WrongLine Line.errorInvalidPrice          " Wrong line (malformed price)  -0  Group2"
-  , WrongLine Line.errorInvalidPrice          " Wrong line (malformed price)  0+  Group2"
+  [ Wrong Line.errorInvalidPrice          " Wrong line (only 1 space between name and price) 1000  Group2"
+  , Wrong Line.errorNoSeparatorAfterPrice " Wrong line (only 1 space between price and group)  1000 Group2"
+  , Wrong Line.errorNoSeparatorAfterPrice " Wrong line (no group1)  1000"
+  , Wrong Line.errorNoGroup               " Wrong line (no group2)  1000  "
+  , Wrong Line.errorNoName                "   1000  NoName"
+  , Wrong Line.errorInvalidPrice          " Wrong line (price is 0)  0  Group2"
+  , Wrong Line.errorInvalidPrice          " Wrong line (malformed price)  -0  Group2"
+  , Wrong Line.errorInvalidPrice          " Wrong line (malformed price)  0+  Group2"
   ]
 
 
