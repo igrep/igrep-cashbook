@@ -68,8 +68,9 @@ all =
       [ suite ".calculate"
         [ test "given cashbook files, calculates sums by group" <|
             assertEqual
-              expectedSummary
-              (Summary.calculate exampleFiles Summary.init)
+              -- FIXME: Workaround for the bug of (==) for complex structures
+              (toString expectedSummary)
+              (toString <| Summary.calculate exampleFiles Summary.init)
         ]
       ]
     ]
@@ -142,6 +143,7 @@ expectedSummary =
     expenditures
     incomes
     (totalExpenditures + totalIncomes)
+    (expectedWrongLines ++ expectedWrongLines)
 
 
 expectedLines : List Line.Model
@@ -152,14 +154,19 @@ expectedLines =
   , Ok <| SuccessLine -10000 "Group2"
   , Ok <| SuccessLine 10 "Group2"
   , Ok <| SuccessLine -1000 "Group2"
-  , Err <| WrongLine Line.errorInvalidPrice          " Wrong line (only 1 space between name and price) 1000  Group2"
-  , Err <| WrongLine Line.errorNoSeparatorAfterPrice " Wrong line (only 1 space between price and group)  1000 Group2"
-  , Err <| WrongLine Line.errorNoSeparatorAfterPrice " Wrong line (no group1)  1000"
-  , Err <| WrongLine Line.errorNoGroup               " Wrong line (no group2)  1000  "
-  , Err <| WrongLine Line.errorNoName                "   1000  NoName"
-  , Err <| WrongLine Line.errorInvalidPrice          " Wrong line (price is 0)  0  Group2"
-  , Err <| WrongLine Line.errorInvalidPrice          " Wrong line (malformed price)  -0  Group2"
-  , Err <| WrongLine Line.errorInvalidPrice          " Wrong line (malformed price)  0+  Group2"
+  ] ++ List.map Err expectedWrongLines
+
+
+expectedWrongLines : List Line.WrongLine
+expectedWrongLines =
+  [ WrongLine Line.errorInvalidPrice          " Wrong line (only 1 space between name and price) 1000  Group2"
+  , WrongLine Line.errorNoSeparatorAfterPrice " Wrong line (only 1 space between price and group)  1000 Group2"
+  , WrongLine Line.errorNoSeparatorAfterPrice " Wrong line (no group1)  1000"
+  , WrongLine Line.errorNoGroup               " Wrong line (no group2)  1000  "
+  , WrongLine Line.errorNoName                "   1000  NoName"
+  , WrongLine Line.errorInvalidPrice          " Wrong line (price is 0)  0  Group2"
+  , WrongLine Line.errorInvalidPrice          " Wrong line (malformed price)  -0  Group2"
+  , WrongLine Line.errorInvalidPrice          " Wrong line (malformed price)  0+  Group2"
   ]
 
 
