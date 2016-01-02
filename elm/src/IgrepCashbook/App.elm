@@ -37,11 +37,10 @@ update : Action -> Model -> (Model, Effects Action)
 update a m =
   case a of
     FetchFileListData s ->
-      ( { m
-          | fileList =  (FileList.replaceByData s) m.fileList
-        }
-      , fetchFile <| FileList.latestFileNameOf m.fileList
-      )
+      let m' =
+        { m | fileList =  FileList.replaceByData s m.fileList }
+      in
+      (m', fetchFile <| FileList.latestFileNameOf m'.fileList)
     FetchCashbookData fileName s ->
       ( { m
           | fileList = (FileList.parseAndSet fileName s) m.fileList
