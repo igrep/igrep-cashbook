@@ -14,7 +14,7 @@ import List
 
 type alias Model =
   { name : String
-  , items : List Line.Model
+  , lines : List Line.Model
   }
 
 
@@ -32,4 +32,4 @@ parseToLines =
 
 
 isCalculated : Model -> Bool
-isCalculated = (.items) >> (not << List.isEmpty)
+isCalculated = (.lines) >> (not << List.isEmpty)

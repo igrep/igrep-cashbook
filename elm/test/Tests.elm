@@ -57,7 +57,7 @@ all =
 
     , suite ".File"
       [ suite ".parse"
-        [ test "given lines representing cashbook lines, returns parsed items" <|
+        [ test "given lines representing cashbook lines, returns parsed lines" <|
             assertEqual
               (File.Model "name" expectedLines)
               (File.parse "name" exampleCashbookData)

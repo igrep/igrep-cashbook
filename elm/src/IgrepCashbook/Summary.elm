@@ -44,7 +44,7 @@ calculate fs m =
 
 addFile : IgrepCashbook.File.Model -> Model -> Model
 addFile f m =
-  List.foldr addLine m f.items
+  List.foldr addLine m f.lines
 
 
 addLine : Line.Model -> Model -> Model
