@@ -14,6 +14,7 @@ import ElmTest exposing
 import IgrepCashbook.FileList as FileList
 import IgrepCashbook.File as File
 import IgrepCashbook.Line as Line exposing (SuccessLine, WrongLine)
+import IgrepCashbook.Summary as Summary exposing (SubSummary)
 
 import Dict
 
@@ -62,6 +63,15 @@ all =
               (File.parse "name" exampleCashbookData)
         ]
       ]
+
+    , suite ".Summary"
+      [ suite ".calculate"
+        [ test "given cashbook files, calculates sums by group" <|
+            assertEqual
+              expectedSummary
+              (Summary.calculate exampleFiles Summary.init)
+        ]
+      ]
     ]
 
 
@@ -108,6 +118,30 @@ exampleCashbookData = """
  Wrong line (malformed price)  -0  Group2
  Wrong line (malformed price)  0+  Group2
 """
+
+
+exampleFiles : List File.Model
+exampleFiles =
+  [File.parse "file1" exampleCashbookData, File.parse "file1" exampleCashbookData]
+
+
+expectedSummary : Summary.Model
+expectedSummary =
+  let totalExpenditures = (-2000 + -10000 + -1000) * 2
+      expenditures =
+        SubSummary
+          (Dict.fromList [("Group1", -2000 * 2), ("Group2", (-10000 + -1000) * 2)])
+          totalExpenditures
+      totalIncomes = (12300000 + 100 + 10) * 2
+      incomes =
+        SubSummary
+          (Dict.fromList [("Group1", 12300000 * 2), ("Group2", (100 + 10) * 2)])
+          totalIncomes
+  in
+  Summary.Model
+    expenditures
+    incomes
+    (totalExpenditures + totalIncomes)
 
 
 expectedLines : List Line.Model

@@ -45,7 +45,10 @@ update a m =
     FetchCashbookData fileName s ->
       ( { m
           | fileList = (FileList.parseAndSet fileName s) m.fileList
-          , summary = Summary.calculate <| FileList.collectCalculatedFiles m.fileList
+          , summary =
+              Summary.calculate
+                (FileList.collectCalculatedFiles m.fileList)
+                m.summary
         }
       , Effects.none
       )
