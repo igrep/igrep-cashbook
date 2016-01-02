@@ -43,15 +43,10 @@ update a m =
       in
       (m', fetchFile <| FileList.latestFileNameOf m'.fileList)
     FetchCashbookData fileName s ->
-      ( { m
-          | fileList = (FileList.parseAndSet fileName s) m.fileList
-          , summary =
-              Summary.calculate
-                (FileList.collectCalculatedFiles m.fileList)
-                m.summary
-        }
-      , Effects.none
-      )
+      let m' = { m | fileList = (FileList.parseAndSet fileName s) m.fileList }
+          files = FileList.collectCalculatedFiles m'.fileList
+      in
+      ({ m' | summary = Summary.calculate files m'.summary }, Effects.none)
 
 
 initialFetch : Effects Action
