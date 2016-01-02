@@ -12,6 +12,7 @@ import IgrepCashbook.Line
 import Dict exposing (Dict)
 import Html exposing (..)
 import List
+import Maybe
 import Result.Extra
 
 type alias Model =
