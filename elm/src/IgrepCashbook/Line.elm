@@ -49,7 +49,7 @@ parse line =
         (*)
           <$> sign
           <*> (
-            (unsafeToInt << noSeparator)
+            (toInt << noSeparator)
               <$> (Combine.regex "[1-9][_,\\d]*" <?> errorInvalidPrice)
           )
       parser =
@@ -103,8 +103,8 @@ priceSeparatorRegex =
   Regex.regex "[,_]"
 
 
-unsafeToInt : String -> Int
-unsafeToInt =
+toInt : String -> Int
+toInt =
   String.toInt
     >> Result.withDefault 0
 
