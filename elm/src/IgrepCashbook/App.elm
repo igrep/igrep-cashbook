@@ -39,7 +39,7 @@ update a m =
   case a of
     FetchFileListData s ->
       let m' =
-        { m | fileList =  FileList.replaceByData s m.fileList }
+        { m | fileList = FileList.replaceByData s m.fileList }
       in
       (m', fetchFile <| FileList.latestFileNameOf m'.fileList)
     FetchCashbookData fileName s ->
