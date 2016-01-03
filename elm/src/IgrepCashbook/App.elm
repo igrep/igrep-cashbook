@@ -26,6 +26,7 @@ type alias Model =
 type Action =
   FetchFileListData String
     | FetchCashbookData String String
+    | ModifyFileList FileList.Action
 
 
 init : (Model, Effects Action)
@@ -45,9 +46,16 @@ update a m =
       (m', fetchFile <| FileList.latestFileNameOf m'.fileList)
     FetchCashbookData fileName s ->
       let m' = { m | fileList = (FileList.parseAndSet fileName s) m.fileList }
-          files = FileList.collectCalculatedFiles m'.fileList
+          files = FileList.collectSelected m'.fileList
       in
       ({ m' | summary = Summary.calculate files m'.summary }, Effects.none)
+    ModifyFileList fileListAction ->
+      let (fileList', fileNameToFetch) = FileList.update fileListAction m.fileList
+          m' = { m | fileList = fileList' }
+      in
+          case fileNameToFetch of
+            Just fileName -> (m', fetchFile fileName)
+            _ -> (m', Effects.none)
 
 
 initialFetch : Effects Action
@@ -77,8 +85,8 @@ fetchFromPathToTask path dataToAction =
 
 
 view : Signal.Address Action -> Model -> Html
-view _ m =
+view a m =
   div [] <|
-    [ FileList.view m.fileList
+    [ FileList.view (Signal.forwardTo a ModifyFileList) m.fileList
     , Summary.view m.summary
     ]

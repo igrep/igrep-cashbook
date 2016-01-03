@@ -1,12 +1,14 @@
 module IgrepCashbook.FileList
   ( Model
+  , Action (..)
   , init
   , replaceByData
   , parseAndSet
+  , update
   , view
   , extractFromHtml
   , latestFileNameOf
-  , collectCalculatedFiles
+  , collectSelected
   , fromPaths
   ) where
 
@@ -17,7 +19,7 @@ import List exposing (map, filterMap, head)
 import Maybe
 import Regex exposing (regex, find, HowMany(..))
 import String
-import Signal
+import Signal exposing (Address)
 import Task exposing (onError, succeed)
 
 import Html exposing (..)
@@ -33,6 +35,8 @@ type alias FileList =
 
 
 type alias Model = Result String FileList
+
+type Action = ModifyFile String File.Action
 
 
 init : Model
@@ -61,21 +65,46 @@ parseAndSet fileName data m =
             Dict.insert fileName (File.parse fileName data) fileList.files
         }
     Err e ->
-      let _ = log "Assertion failure this should not be executed except in test. The Error was: " e
+      let _ = logAssertionFailure e
       in
           Ok <| { files = Dict.singleton fileName <| File.parse fileName data }
 
 
-view : Model -> Html
-view m =
+update : Action -> Model -> (Model, Maybe String)
+update (ModifyFile fileName fileAction) m =
+  case m of
+    Ok fileList ->
+      let files' =
+            Dict.update fileName (fileUpdater fileName fileAction) fileList.files
+          (File.SelectOrUnselect isSelected) = fileAction
+      in
+        ( Ok <| { files = files' }
+        , if isSelected then Just fileName else Nothing
+        )
+    Err e ->
+      let _ = logAssertionFailure e
+      in
+        (m, Nothing)
+
+
+fileUpdater : String -> File.Action -> Maybe File.Model -> Maybe File.Model
+fileUpdater fileName fileAction =
+  Just << File.update fileAction << Maybe.withDefault (File.init fileName)
+
+
+view : Address Action -> Model -> Html
+view a m =
   case m of
     Ok p ->
-      let fileNames = Dict.keys p.files
+      let files = Dict.values p.files
       in
-          if List.isEmpty fileNames then
+          if List.isEmpty files then
             div [] [text "No cashbook files found. Isn't this a cashbook file directory?"]
           else
-            ul [] <| map (li [] << singleton << text) fileNames
+            let fileActionAddressOf file =
+                  Signal.forwardTo a (ModifyFile file.name)
+            in
+              ul [] <| map (\f -> li [] <| File.view (fileActionAddressOf f) f) files
     Err s ->
       div [] [text s]
 
@@ -108,11 +137,11 @@ latestFileNameOf m =
       ""
 
 
-collectCalculatedFiles : Model -> List File.Model
-collectCalculatedFiles m =
+collectSelected : Model -> List File.Model
+collectSelected m =
   case m of
     Ok fileList ->
-      fileList.files |> Dict.values |> List.filter File.isCalculated
+      fileList.files |> Dict.values |> List.filter (.isSelected)
     Err _ ->
       []
 
@@ -145,3 +174,8 @@ noDefaultPath =
 
 loading : String
 loading = "Loading cashbook files..."
+
+
+logAssertionFailure : String -> String
+logAssertionFailure e =
+  log "Assertion failure this should not be executed except in test. The Error was: " e

@@ -42,6 +42,7 @@ calculate fs m =
   List.foldl addFile m fs
 
 
+-- FIXME: clear before adding already added file
 addFile : IgrepCashbook.File.Model -> Model -> Model
 addFile f m =
   List.foldr (addLine f.name) m f.lines
