@@ -49,7 +49,7 @@ viewWrongs wls =
 
 liWrong : Wrong -> Html
 liWrong wl =
-  li [] [text <| wl.errorMessage ++ ": " ++ toString wl.content]
+  li [] [text <| wl.errorMessage ++ " at line " ++ toString wl.at ++ ": " ++ toString wl.content]
 
 parseList : List String -> List Model
 parseList =
