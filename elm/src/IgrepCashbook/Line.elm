@@ -53,7 +53,7 @@ liWrong wl =
 
 parseList : List String -> List Model
 parseList =
-  List.indexedMap (\i l -> (i, eraseComment l))
+  List.indexedMap (\i l -> (i + 1, eraseComment l))
     >> List.filter (not << isIgnored << snd)
     >> List.map (uncurry parse)
 
