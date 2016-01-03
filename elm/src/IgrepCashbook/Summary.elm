@@ -18,7 +18,7 @@ type alias Model =
   { expenditures : SubSummary
   , incomes      : SubSummary
   , total        : Int
-  , errors       : List Line.Wrong
+  , errors       : Dict String (List Line.Wrong)
   }
 
 type alias SubSummary =
@@ -29,7 +29,7 @@ type alias SubSummary =
 
 init : Model
 init =
-  Model initSubSummary initSubSummary 0 []
+  Model initSubSummary initSubSummary 0 Dict.empty
 
 
 initSubSummary : SubSummary
@@ -44,11 +44,11 @@ calculate fs m =
 
 addFile : IgrepCashbook.File.Model -> Model -> Model
 addFile f m =
-  List.foldr addLine m f.lines
+  List.foldr (addLine f.name) m f.lines
 
 
-addLine : Line.Model -> Model -> Model
-addLine l m =
+addLine : String -> Line.Model -> Model -> Model
+addLine fileName l m =
   case l of
     Ok sl ->
       if sl.price >= 0 then
@@ -56,7 +56,7 @@ addLine l m =
       else
         { m | total = m.total + sl.price, expenditures = addLineToSubSummary sl m.expenditures }
     Err wl ->
-      { m | errors = wl :: m.errors }
+      { m | errors = Dict.update fileName (errorAppender wl) m.errors }
 
 
 addLineToSubSummary : Line.Success -> SubSummary -> SubSummary
@@ -71,16 +71,40 @@ priceAppender newPrice maybePrice =
   Just <| newPrice + (Maybe.withDefault 0 maybePrice)
 
 
+errorAppender : Line.Wrong -> Maybe (List Line.Wrong) -> Maybe (List Line.Wrong)
+errorAppender newError maybeErrors =
+  Just <| newError :: (Maybe.withDefault [] maybeErrors)
+
+
 view : Model -> Html
 view m =
   div [] <|
-    [ Line.viewWrongs m.errors
+    [ viewErrors m.errors
     , h1 [] [text "Expenditures"]
     , table [] (trsFromSubSummary m.expenditures)
     , h1 [] [text "Incomes"]
     , table [] (trsFromSubSummary m.incomes)
     , h1 [] [text <| "Total: " ++ toString m.total]
     ]
+
+
+viewErrors : Dict String (List Line.Wrong) -> Html
+viewErrors es =
+  if Dict.isEmpty es then
+    text ""
+  else
+    let fileNameAndWrongLines = Dict.toList es
+    in
+    div [] <|
+      [ h1 [] [text "Errors"]
+      , ul [] <| List.map (uncurry liErrorsOfFile) fileNameAndWrongLines
+      ]
+
+
+liErrorsOfFile : String -> List Line.Wrong -> Html
+liErrorsOfFile fileName wls =
+  li [] <|
+    (text fileName)::[ol [] <| List.map Line.liWrong wls]
 
 
 trsFromSubSummary : SubSummary -> List Html

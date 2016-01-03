@@ -2,7 +2,7 @@ module IgrepCashbook.Line
   ( Model
   , Success
   , Wrong
-  , viewWrongs
+  , liWrong
   , parse
   , parseList
   , errorNoName
@@ -34,17 +34,6 @@ type alias Wrong =
   , errorMessage : String
   , content : String
   }
-
-
-viewWrongs : List Wrong -> Html
-viewWrongs wls =
-  if List.isEmpty wls then
-    text ""
-  else
-    div [] <|
-      [ h1 [] [text "Errors"]
-      , ol [] <| List.map liWrong wls
-      ]
 
 
 liWrong : Wrong -> Html

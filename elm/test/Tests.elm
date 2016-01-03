@@ -142,8 +142,8 @@ expectedSummary =
   Summary.Model
     expenditures
     incomes
-    (totalExpenditures + totalIncomes)
-    (expectedWrongLines ++ expectedWrongLines)
+    (totalExpenditures + totalIncomes) <|
+      Dict.fromList [("file1", expectedWrongLines), ("file2", expectedWrongLines)]
 
 
 expectedLines : List Line.Model
