@@ -13,7 +13,8 @@ import Effects exposing (Effects, Never)
 import Html exposing (..)
 import Http
 import String
-import Task exposing (onError, succeed)
+import Task exposing (andThen, onError, succeed)
+import TaskTutorial exposing (getCurrentTime)
 
 
 type alias Model =
@@ -66,10 +67,13 @@ fetchFile fileName =
 
 fetchFromPathToTask : String -> (String -> Action) -> Effects Action
 fetchFromPathToTask path dataToAction =
-  Http.getString path
-      `onError` (\e -> let _ = log "ERROR" e in succeed "")
-    |> Task.map dataToAction
-    |> Effects.task
+  let getData =
+        getCurrentTime
+          `andThen` \time ->
+            Http.getString (path ++ "?_=" ++ toString time)
+                `onError` (\e -> let _ = log "ERROR" e in succeed "")
+  in
+  Task.map dataToAction getData |> Effects.task
 
 
 view : Signal.Address Action -> Model -> Html
