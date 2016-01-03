@@ -1,6 +1,5 @@
 module IgrepCashbook.File
   ( init
-  -- , update
   , parse
   , isCalculated
   , Model
