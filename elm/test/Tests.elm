@@ -159,14 +159,14 @@ expectedLines =
 
 expectedWrongLines : List Line.Wrong
 expectedWrongLines =
-  [ Wrong Line.errorInvalidPrice          " Wrong line (only 1 space between name and price) 1000  Group2"
-  , Wrong Line.errorNoSeparatorAfterPrice " Wrong line (only 1 space between price and group)  1000 Group2"
-  , Wrong Line.errorNoSeparatorAfterPrice " Wrong line (no group1)  1000"
-  , Wrong Line.errorNoGroup               " Wrong line (no group2)  1000  "
-  , Wrong Line.errorNoName                "   1000  NoName"
-  , Wrong Line.errorInvalidPrice          " Wrong line (price is 0)  0  Group2"
-  , Wrong Line.errorInvalidPrice          " Wrong line (malformed price)  -0  Group2"
-  , Wrong Line.errorInvalidPrice          " Wrong line (malformed price)  0+  Group2"
+  [ Wrong 17 Line.errorInvalidPrice          " Wrong line (only 1 space between name and price) 1000  Group2"
+  , Wrong 18 Line.errorNoSeparatorAfterPrice " Wrong line (only 1 space between price and group)  1000 Group2"
+  , Wrong 19 Line.errorNoSeparatorAfterPrice " Wrong line (no group1)  1000"
+  , Wrong 20 Line.errorNoGroup               " Wrong line (no group2)  1000  "
+  , Wrong 21 Line.errorNoName                "   1000  NoName"
+  , Wrong 22 Line.errorInvalidPrice          " Wrong line (price is 0)  0  Group2"
+  , Wrong 23 Line.errorInvalidPrice          " Wrong line (malformed price)  -0  Group2"
+  , Wrong 24 Line.errorInvalidPrice          " Wrong line (malformed price)  0+  Group2"
   ]
 
 

@@ -30,7 +30,8 @@ type alias Success =
   }
 
 type alias Wrong =
-  { errorMessage : String
+  { at : Int
+  , errorMessage : String
   , content : String
   }
 
@@ -52,13 +53,13 @@ liWrong wl =
 
 parseList : List String -> List Model
 parseList =
-  List.map eraseComment
-    >> List.filter (not << isIgnored)
-    >> List.map parse
+  List.indexedMap (\i l -> (i, eraseComment l))
+    >> List.filter (not << isIgnored << snd)
+    >> List.map (uncurry parse)
 
 
-parse : String -> Model
-parse line =
+parse : Int -> String -> Model
+parse lineNumber line =
   let nameField = String.trimLeft <$> Combine.regex "(\\S| (?! ))+" <?> errorNoName
       groupField = String.trimRight <$> Combine.regex "\\S+" <?> errorNoGroup
       sign = Combine.optional -1 (1 <$ char '+')
@@ -82,7 +83,7 @@ parse line =
         Combine.Done successLine ->
           Ok successLine
         Combine.Fail errorMessages ->
-          Err <| Wrong (String.join ", " errorMessages) line
+          Err <| Wrong lineNumber (String.join ", " errorMessages) line
 
 
 twoOrMoreSpaces : Combine.Parser ()
