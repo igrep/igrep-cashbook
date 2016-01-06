@@ -59,7 +59,7 @@ all =
       [ suite ".parse"
         [ test "given lines representing cashbook lines, returns parsed lines" <|
             assertEqual
-              (File.Model "name" expectedLines)
+              (File.Model "name" expectedLines True)
               (File.parse "name" exampleCashbookData)
         ]
       ]
@@ -70,7 +70,7 @@ all =
             assertEqual
               -- FIXME: Workaround for the bug of (==) for complex structures
               (toString expectedSummary)
-              (toString <| Summary.calculate exampleFiles Summary.init)
+              (toString <| Summary.calculate exampleFiles)
         ]
       ]
     ]

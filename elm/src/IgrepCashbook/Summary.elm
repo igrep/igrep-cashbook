@@ -37,12 +37,11 @@ initSubSummary =
   SubSummary Dict.empty 0
 
 
-calculate : List IgrepCashbook.File.Model -> Model -> Model
-calculate fs m =
-  List.foldl addFile m fs
+calculate : List IgrepCashbook.File.Model -> Model
+calculate fs =
+  List.foldl addFile init fs
 
 
--- FIXME: clear before adding already added file
 addFile : IgrepCashbook.File.Model -> Model -> Model
 addFile f m =
   List.foldr (addLine f.name) m f.lines

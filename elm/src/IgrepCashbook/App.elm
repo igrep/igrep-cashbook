@@ -46,16 +46,21 @@ update a m =
       (m', fetchFile <| FileList.latestFileNameOf m'.fileList)
     FetchCashbookData fileName s ->
       let m' = { m | fileList = (FileList.parseAndSet fileName s) m.fileList }
-          files = FileList.collectSelected m'.fileList
       in
-      ({ m' | summary = Summary.calculate files m'.summary }, Effects.none)
+          (updateSummary m', Effects.none)
     ModifyFileList fileListAction ->
       let (fileList', fileNameToFetch) = FileList.update fileListAction m.fileList
           m' = { m | fileList = fileList' }
       in
           case fileNameToFetch of
             Just fileName -> (m', fetchFile fileName)
-            _ -> (m', Effects.none)
+            -- No fileNameToFetch means the file is unselected.
+            _ -> (updateSummary m', Effects.none)
+
+
+updateSummary : Model -> Model
+updateSummary m =
+  { m | summary = Summary.calculate <| FileList.collectSelected m.fileList }
 
 
 initialFetch : Effects Action
