@@ -1,0 +1,30 @@
+{
+  "name": "igrep-cashbook-elm",
+  "version": "0.0.1",
+  "description": "Programs and libraries to manipulate my 2-spaces-or-tab separated cashbook.",
+  "main": "elm.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "elm-test test/TestRunner.elm"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/igrep/igrep-cashbook.git"
+  },
+  "keywords": [
+    "app"
+  ],
+  "author": "Yuji Yamamoto",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/igrep/igrep-cashbook/issues"
+  },
+  "homepage": "https://github.com/igrep/igrep-cashbook#readme",
+  "devDependencies": {
+    "elm-test": "^0.16.0",
+    "elm-webpack-loader": "^2.0.0",
+    "webpack": "^1.12.10"
+  }
+}
