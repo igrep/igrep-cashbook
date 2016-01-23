@@ -1,10 +1,13 @@
 var ELM_SOURCE_DIRECTORY = __dirname + '/src/';
 
 module.exports = {
-  entry: ELM_SOURCE_DIRECTORY + 'Main.elm',
+  entry: './src/index.js',
   output: {
-    path: __dirname,
+    path: './dist/',
     filename: 'bundle.js'
+  },
+  resolve: {
+    extensions: ['', '.js']
   },
   module: {
     loaders: [{

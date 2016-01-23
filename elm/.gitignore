@@ -1,4 +1,6 @@
-/elm-stuff
+/elm-stuff/
+/node_modules/
+/dist/
+
 elm.js
 bundle.js
-/node_modules/
