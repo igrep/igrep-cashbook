@@ -1,5 +1,3 @@
-var ELM_SOURCE_DIRECTORY = __dirname + '/src/';
-
 module.exports = {
   entry: './src/index.js',
   output: {
