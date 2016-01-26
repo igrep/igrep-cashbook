@@ -80,11 +80,11 @@ view : Model -> Html
 view m =
   div [] <|
     [ viewErrors m.errors
+    , h1 [] [text <| "Total: " ++ toString m.total]
     , h1 [] [text "Expenditures"]
     , table [] (trsFromSubSummary m.expenditures)
     , h1 [] [text "Incomes"]
     , table [] (trsFromSubSummary m.incomes)
-    , h1 [] [text <| "Total: " ++ toString m.total]
     ]
 
 
@@ -109,7 +109,7 @@ liErrorsOfFile fileName wls =
 
 trsFromSubSummary : SubSummary -> List Html
 trsFromSubSummary s =
-  (Dict.toList s.breakdown |> List.map toTableRow) ++ [trSubTotal s]
+  [trSubTotal s] ++ (Dict.toList s.breakdown |> List.map toTableRow)
 
 
 trSubTotal : SubSummary -> Html
