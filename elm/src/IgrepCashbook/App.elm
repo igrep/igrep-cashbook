@@ -1,9 +1,9 @@
-module IgrepCashbook.App
+module IgrepCashbook.App exposing
   ( Model
   , init
   , update
   , view
-  ) where
+  )
 
 import IgrepCashbook.Summary as Summary
 import IgrepCashbook.FileList as FileList

@@ -1,11 +1,11 @@
-module IgrepCashbook.File
+module IgrepCashbook.File exposing
   ( init
   , parse
   , update
   , view
   , Model
   , Action (SelectOrUnselect)
-  ) where
+  )
 
 import IgrepCashbook.Line as Line
 

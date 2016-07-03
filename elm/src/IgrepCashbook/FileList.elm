@@ -1,4 +1,4 @@
-module IgrepCashbook.FileList
+module IgrepCashbook.FileList exposing
   ( Model
   , Action (..)
   , init
@@ -10,7 +10,7 @@ module IgrepCashbook.FileList
   , latestFileNameOf
   , collectSelected
   , fromPaths
-  ) where
+  )
 
 import IgrepCashbook.File as File
 

@@ -1,4 +1,4 @@
-module IgrepCashbook.Line
+module IgrepCashbook.Line exposing
   ( Model
   , Success
   , Wrong
@@ -10,7 +10,7 @@ module IgrepCashbook.Line
   , errorInvalidPrice
   , errorNoSeparatorAfterPrice
   , errorNoSeparatorAfterName
-  ) where
+  )
 
 import Combine exposing (many1)
 import Combine.Infix exposing (..)

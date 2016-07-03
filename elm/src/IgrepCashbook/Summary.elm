@@ -1,10 +1,10 @@
-module IgrepCashbook.Summary
+module IgrepCashbook.Summary exposing
   ( Model
   , SubSummary
   , calculate
   , init
   , view
-  ) where
+  )
 
 import IgrepCashbook.File
 import IgrepCashbook.Line as Line
