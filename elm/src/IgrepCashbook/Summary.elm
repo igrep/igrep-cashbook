@@ -76,7 +76,7 @@ errorAppender newError maybeErrors =
   Just <| newError :: (Maybe.withDefault [] maybeErrors)
 
 
-view : Model -> Html
+view : Model -> Html msg
 view m =
   div [] <|
     [ viewErrors m.errors
@@ -88,7 +88,7 @@ view m =
     ]
 
 
-viewErrors : Dict String (List Line.Wrong) -> Html
+viewErrors : Dict String (List Line.Wrong) -> Html msg
 viewErrors es =
   if Dict.isEmpty es then
     text ""
@@ -101,23 +101,23 @@ viewErrors es =
       ]
 
 
-liErrorsOfFile : String -> List Line.Wrong -> Html
+liErrorsOfFile : String -> List Line.Wrong -> Html msg
 liErrorsOfFile fileName wls =
   li [] <|
     (text fileName)::[ol [] <| List.map Line.liWrong wls]
 
 
-trsFromSubSummary : SubSummary -> List Html
+trsFromSubSummary : SubSummary -> List (Html msg)
 trsFromSubSummary s =
   [trSubTotal s] ++ (Dict.toList s.breakdown |> List.map toTableRow)
 
 
-trSubTotal : SubSummary -> Html
+trSubTotal : SubSummary -> Html msg
 trSubTotal s =
   toTableRow ("Sub Total", s.subTotal)
 
 
-toTableRow : (String, Int) -> Html
+toTableRow : (String, Int) -> Html msg
 toTableRow (header, value) =
   tr [] [th [] [text header], td [] [text (toString <| abs value)]]
 

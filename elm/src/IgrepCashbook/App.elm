@@ -9,12 +9,12 @@ import IgrepCashbook.Summary as Summary
 import IgrepCashbook.FileList as FileList
 
 import Debug exposing (..)
-import Effects exposing (Effects, Never)
 import Html exposing (..)
+import Html.App as Html
 import Http
 import String
 import Task exposing (andThen, onError, succeed)
-import TaskTutorial exposing (getCurrentTime)
+import Time
 
 
 type alias Model =
@@ -23,20 +23,20 @@ type alias Model =
   }
 
 
-type Action =
+type Msg =
   FetchFileListData String
     | FetchCashbookData String String
-    | ModifyFileList FileList.Action
+    | ModifyFileList FileList.Msg
 
 
-init : (Model, Effects Action)
+init : (Model, Cmd Msg)
 init =
   ( Model FileList.init Summary.init
   , initialFetch
   )
 
 
-update : Action -> Model -> (Model, Effects Action)
+update : Msg -> Model -> (Model, Cmd Msg)
 update a m =
   case a of
     FetchFileListData s ->
@@ -47,7 +47,7 @@ update a m =
     FetchCashbookData fileName s ->
       let m' = { m | fileList = (FileList.parseAndSet fileName s) m.fileList }
       in
-          (updateSummary m', Effects.none)
+          (updateSummary m', Cmd.none)
     ModifyFileList fileListAction ->
       let (fileList', fileNameToFetch) = FileList.update fileListAction m.fileList
           m' = { m | fileList = fileList' }
@@ -55,7 +55,7 @@ update a m =
           case fileNameToFetch of
             Just fileName -> (m', fetchFile fileName)
             -- No fileNameToFetch means the file is unselected.
-            _ -> (updateSummary m', Effects.none)
+            _ -> (updateSummary m', Cmd.none)
 
 
 updateSummary : Model -> Model
@@ -63,35 +63,35 @@ updateSummary m =
   { m | summary = Summary.calculate <| FileList.collectSelected m.fileList }
 
 
-initialFetch : Effects Action
+initialFetch : Cmd Msg
 initialFetch =
   fetchFromPathToTask "/" FetchFileListData
 
 
-fetchFile : String -> Effects Action
+fetchFile : String -> Cmd Msg
 fetchFile fileName =
   if String.isEmpty fileName then
     let _ = log "Can't get a cashbook file. Isn't this a cashbook file directory?"
     in
-        Effects.none
+      Cmd.none
   else
     fetchFromPathToTask ("/" ++ fileName) (FetchCashbookData fileName)
 
 
-fetchFromPathToTask : String -> (String -> Action) -> Effects Action
+fetchFromPathToTask : String -> (String -> Msg) -> Cmd Msg
 fetchFromPathToTask path dataToAction =
   let getData =
-        getCurrentTime
+        Time.now
           `andThen` \time ->
             Http.getString (path ++ "?_=" ++ toString time)
                 `onError` (\e -> let _ = log "ERROR" e in succeed "")
   in
-  Task.map dataToAction getData |> Effects.task
+    Task.perform (Debug.crash "Assertion failure!") dataToAction getData
 
 
-view : Signal.Address Action -> Model -> Html
-view a m =
+view : Model -> Html Msg
+view m =
   div [] <|
-    [ FileList.view (Signal.forwardTo a ModifyFileList) m.fileList
+    [ Html.map ModifyFileList (FileList.view m.fileList)
     , Summary.view m.summary
     ]

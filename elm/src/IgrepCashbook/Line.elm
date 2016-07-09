@@ -36,7 +36,7 @@ type alias Wrong =
   }
 
 
-liWrong : Wrong -> Html
+liWrong : Wrong -> Html msg
 liWrong wl =
   li [] [text <| wl.errorMessage ++ " at line " ++ toString wl.at ++ ": " ++ toString wl.content]
 
@@ -69,9 +69,9 @@ parse lineNumber line =
       (result, _) = Combine.parse parser line
   in
       case result of
-        Combine.Done successLine ->
+        Ok successLine ->
           Ok successLine
-        Combine.Fail errorMessages ->
+        Err errorMessages ->
           Err <| Wrong lineNumber (String.join ", " errorMessages) line
 
 
