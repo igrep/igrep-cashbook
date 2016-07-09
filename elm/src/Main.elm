@@ -3,10 +3,9 @@ module Main exposing (..)
 import IgrepCashbook.App
 
 import Html.App as Html
-import Task exposing (Task)
 
 
--- TODO: see main's type main : Signal Html
+main : Program Never
 main =
   Html.program
   { init = IgrepCashbook.App.init
