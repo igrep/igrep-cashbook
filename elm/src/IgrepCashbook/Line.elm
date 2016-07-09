@@ -15,10 +15,8 @@ module IgrepCashbook.Line exposing
 import Combine exposing (many1)
 import Combine.Infix exposing (..)
 import Combine.Char exposing (char, space)
-import Debug
 import Html exposing (..)
 import String
-import List
 import Regex exposing (Regex)
 import Result
 

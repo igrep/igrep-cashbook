@@ -13,7 +13,6 @@ import Html exposing (..)
 import Html.Attributes exposing (type', checked)
 import Html.Events as Events exposing (on)
 import Json.Decode as Json
-import List
 import String
 
 

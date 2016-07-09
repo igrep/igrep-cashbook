@@ -19,13 +19,9 @@ import List exposing (filterMap, head)
 import Maybe
 import Regex exposing (regex, find, HowMany(..))
 import String
-import Task exposing (onError, succeed)
 
 import Html exposing (..)
 import Html.App as Html
-import Http
-
-import Debug exposing (..)
 
 
 type alias FileList =
@@ -174,4 +170,4 @@ loading = "Loading cashbook files..."
 
 logAssertionFailure : String -> String
 logAssertionFailure e =
-  log "Assertion failure this should not be executed except in test. The Error was: " e
+  Debug.log "Assertion failure this should not be executed except in test. The Error was: " e

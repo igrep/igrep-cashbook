@@ -8,7 +8,6 @@ module IgrepCashbook.App exposing
 import IgrepCashbook.Summary as Summary
 import IgrepCashbook.FileList as FileList
 
-import Debug exposing (..)
 import Html exposing (..)
 import Html.App as Html
 import Http
@@ -71,7 +70,7 @@ initialFetch =
 fetchFile : String -> Cmd Msg
 fetchFile fileName =
   if String.isEmpty fileName then
-    let _ = log "Can't get a cashbook file. Isn't this a cashbook file directory?"
+    let _ = Debug.log "Can't get a cashbook file. Isn't this a cashbook file directory?"
     in
       Cmd.none
   else
@@ -84,7 +83,7 @@ fetchFromPathToTask path dataToAction =
         Time.now
           `andThen` \time ->
             Http.getString (path ++ "?_=" ++ toString time)
-                `onError` (\e -> let _ = log "ERROR" e in succeed "")
+                `onError` (\e -> let _ = Debug.log "ERROR" e in succeed "")
   in
     Task.perform (Debug.crash "Assertion failure!") dataToAction getData
 
