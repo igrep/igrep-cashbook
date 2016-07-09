@@ -1,6 +1,6 @@
-module IgrepCashbook.FileList
+module IgrepCashbook.FileList exposing
   ( Model
-  , Action (..)
+  , Msg (..)
   , init
   , replaceByData
   , parseAndSet
@@ -10,20 +10,19 @@ module IgrepCashbook.FileList
   , latestFileNameOf
   , collectSelected
   , fromPaths
-  ) where
+  )
 
 import IgrepCashbook.File as File
 
 import Dict exposing (Dict)
-import List exposing (map, filterMap, head)
+import List exposing (filterMap, head)
 import Maybe
 import Regex exposing (regex, find, HowMany(..))
 import String
-import Signal exposing (Address)
 import Task exposing (onError, succeed)
 
 import Html exposing (..)
-import Effects exposing (Effects, Never)
+import Html.App as Html
 import Http
 
 import Debug exposing (..)
@@ -36,7 +35,7 @@ type alias FileList =
 
 type alias Model = Result String FileList
 
-type Action = ModifyFile String File.Action
+type Msg = ModifyFile String File.Msg
 
 
 init : Model
@@ -50,7 +49,7 @@ replaceByData data m =
   else
     let fileNames = extractFromHtml data
         fileNameAndFiles =
-          map (\fileName -> (fileName, File.init fileName)) fileNames
+          List.map (\fileName -> (fileName, File.init fileName)) fileNames
     in
     Ok <| FileList <| Dict.fromList fileNameAndFiles
 
@@ -70,7 +69,7 @@ parseAndSet fileName data m =
           Ok <| { files = Dict.singleton fileName <| File.parse fileName data }
 
 
-update : Action -> Model -> (Model, Maybe String)
+update : Msg -> Model -> (Model, Maybe String)
 update (ModifyFile fileName fileAction) m =
   case m of
     Ok fileList ->
@@ -87,13 +86,13 @@ update (ModifyFile fileName fileAction) m =
         (m, Nothing)
 
 
-fileUpdater : String -> File.Action -> Maybe File.Model -> Maybe File.Model
+fileUpdater : String -> File.Msg -> Maybe File.Model -> Maybe File.Model
 fileUpdater fileName fileAction =
   Just << File.update fileAction << Maybe.withDefault (File.init fileName)
 
 
-view : Address Action -> Model -> Html
-view a m =
+view : Model -> Html Msg
+view m =
   case m of
     Ok p ->
       let files = Dict.values p.files
@@ -101,10 +100,7 @@ view a m =
           if List.isEmpty files then
             div [] [text "No cashbook files found. Isn't this a cashbook file directory?"]
           else
-            let fileActionAddressOf file =
-                  Signal.forwardTo a (ModifyFile file.name)
-            in
-              ul [] <| map (\f -> li [] <| File.view (fileActionAddressOf f) f) files
+              ul [] <| List.map (\f -> li [] <| List.map (Html.map (ModifyFile f.name)) (File.view f)) files
     Err s ->
       div [] [text s]
 
