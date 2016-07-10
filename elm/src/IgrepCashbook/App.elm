@@ -12,7 +12,7 @@ import Html exposing (..)
 import Html.App as Html
 import Http
 import String
-import Task exposing (andThen, onError, succeed)
+import Task exposing (andThen)
 import Time
 
 
@@ -80,12 +80,10 @@ fetchFile fileName =
 fetchFromPathToTask : String -> (String -> Msg) -> Cmd Msg
 fetchFromPathToTask path dataToAction =
   let getData =
-        Time.now
-          `andThen` \time ->
-            Http.getString (path ++ "?_=" ++ toString time)
-                `onError` (\e -> let _ = Debug.log "ERROR" e in succeed "")
+        Time.now `andThen` \time ->
+          Http.getString (path ++ "?_=" ++ toString time)
   in
-    Task.perform (Debug.crash "Assertion failure!") dataToAction getData
+    Task.perform (\e -> Debug.crash <| "Assertion failure: " ++ toString e) dataToAction getData
 
 
 view : Model -> Html Msg
