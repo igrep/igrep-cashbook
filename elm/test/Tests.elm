@@ -1,14 +1,12 @@
 module Tests exposing (..)
 
-import Graphics.Element exposing (Element)
-
 import ElmTest exposing
   ( test
   , Test
   , suite
   , assert
   , assertEqual
-  , elementRunner
+  , runSuiteHtml
   )
 
 import IgrepCashbook.FileList as FileList
@@ -76,8 +74,8 @@ all =
     ]
 
 
-main : Element
-main = elementRunner all
+main : Program Never
+main = runSuiteHtml all
 
 
 expectedPaths : List String
