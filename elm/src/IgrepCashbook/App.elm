@@ -44,7 +44,7 @@ update a m =
       in
       (m', fetchFile <| FileList.latestFileNameOf m'.fileList)
     FetchCashbookData fileName s ->
-      let m' = { m | fileList = (FileList.parseAndSet fileName s) m.fileList }
+      let m' = { m | fileList = FileList.parseAndSet fileName s m.fileList }
       in
           (updateSummary m', Cmd.none)
     ModifyFileList fileListAction ->
