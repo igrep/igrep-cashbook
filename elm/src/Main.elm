@@ -1,15 +1,18 @@
 module Main exposing (..)
 
 import IgrepCashbook.App
+import IgrepCashbook.UrlHandler
 
-import Html.App as Html
+import Navigation
 
 
 main : Program Never
 main =
-  Html.program
-  { init = IgrepCashbook.App.init
-  , update = IgrepCashbook.App.update
-  , view = IgrepCashbook.App.view
-  , subscriptions = always Sub.none
-  }
+  Navigation.program
+    IgrepCashbook.UrlHandler.parser
+    { init = IgrepCashbook.App.init
+    , update = IgrepCashbook.App.update
+    , urlUpdate = IgrepCashbook.App.urlUpdate
+    , view = IgrepCashbook.App.view
+    , subscriptions = always Sub.none
+    }

@@ -2,12 +2,15 @@ module IgrepCashbook.App exposing
   ( Model
   , init
   , update
+  , urlUpdate
   , view
   )
 
-import IgrepCashbook.Summary as Summary
 import IgrepCashbook.FileList as FileList
+import IgrepCashbook.Summary as Summary
+import IgrepCashbook.UrlHandler exposing (ParsedUrl, pathList)
 
+import Platform.Cmd as Cmd
 import Html exposing (..)
 import Html.App as Html
 import Http
@@ -28,11 +31,16 @@ type Msg =
     | ModifyFileList FileList.Msg
 
 
-init : (Model, Cmd Msg)
-init =
-  ( Model FileList.init Summary.init
-  , initialFetch
-  )
+init : ParsedUrl -> (Model, Cmd Msg)
+init url =
+  let paths = pathList url
+      fetch =
+        if List.isEmpty paths then
+          initialFetch
+        else
+          fetchFiles paths
+  in
+    (Model FileList.init Summary.init, fetch)
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -57,6 +65,10 @@ update a m =
             _ -> (updateSummary m', Cmd.none)
 
 
+urlUpdate : ParsedUrl -> Model -> (Model, Cmd Msg)
+urlUpdate url m =
+  (m, fetchFiles <| pathList url)
+
 updateSummary : Model -> Model
 updateSummary m =
   { m | summary = Summary.calculate <| FileList.collectSelected m.fileList }
@@ -70,6 +82,7 @@ initialFetch =
 fetchFile : String -> Cmd Msg
 fetchFile fileName =
   if String.isEmpty fileName then
+    -- TODO: more helpful error message
     let _ = Debug.log "Can't get a cashbook file. Isn't this a cashbook file directory?"
     in
       Cmd.none
@@ -77,11 +90,24 @@ fetchFile fileName =
     fetchFromPathToTask ("/" ++ fileName) (FetchCashbookData fileName)
 
 
+fetchFiles : List String -> Cmd Msg
+fetchFiles paths =
+  let f path =
+        if String.isEmpty path then
+          Nothing
+        else
+          Just <| fetchFile path
+  in
+    Cmd.batch <| List.filterMap f paths
+
+
 fetchFromPathToTask : String -> (String -> Msg) -> Cmd Msg
 fetchFromPathToTask path dataToAction =
   let getData =
         Time.now `andThen` \time ->
-          Http.getString (path ++ "?_=" ++ toString time)
+          Http.getString (path ++ "?_=" ++ toString (Debug.log "time" time))
+      _ = Debug.log "path" path
+      _ = Debug.log "dataToAction" dataToAction
   in
     Task.perform (\e -> Debug.crash <| "Assertion failure: " ++ toString e) dataToAction getData
 

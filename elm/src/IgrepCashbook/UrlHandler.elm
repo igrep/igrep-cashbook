@@ -1,7 +1,8 @@
 module IgrepCashbook.UrlHandler
   exposing
-    ( ParsedUrl(..)
+    ( ParsedUrl
     , parser
+    , pathList
     )
 
 
@@ -21,3 +22,8 @@ parser =
 parse : Navigation.Location -> ParsedUrl
 parse location =
   ParsedUrl <| String.split "&" <| String.dropLeft 1 location.hash
+
+
+pathList : ParsedUrl -> List String
+pathList (ParsedUrl paths) =
+  paths
