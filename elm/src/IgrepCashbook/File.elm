@@ -10,7 +10,7 @@ module IgrepCashbook.File exposing
 import IgrepCashbook.Line as Line
 
 import Html exposing (..)
-import Html.Attributes exposing (type', checked)
+import Html.Attributes exposing (type_, checked)
 import Html.Events as Events exposing (on)
 import Json.Decode as Json
 import String
@@ -45,7 +45,7 @@ view : Model -> List (Html Msg)
 view m =
   [ input
       [ onChange <| SelectOrUnselect <| not m.isSelected
-      , type' "checkbox"
+      , type_ "checkbox"
       , checked m.isSelected
       ]
       []

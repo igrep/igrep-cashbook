@@ -21,7 +21,6 @@ import Regex exposing (regex, find, HowMany(..))
 import String
 
 import Html exposing (..)
-import Html.App as Html
 
 
 type alias FileList =
@@ -69,11 +68,11 @@ update : Msg -> Model -> (Model, Maybe String)
 update (ModifyFile fileName fileAction) m =
   case m of
     Ok fileList ->
-      let files' =
+      let files_ =
             Dict.update fileName (fileUpdater fileName fileAction) fileList.files
           (File.SelectOrUnselect isSelected) = fileAction
       in
-        ( Ok <| { files = files' }
+        ( Ok <| { files = files_ }
         , if isSelected then Just fileName else Nothing
         )
     Err e ->

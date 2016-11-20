@@ -12,8 +12,7 @@ module IgrepCashbook.Line exposing
   , errorNoSeparatorAfterName
   )
 
-import Combine exposing (many1)
-import Combine.Infix exposing (..)
+import Combine exposing (many1, (<$>), (<$), (<*>), (<*), (<?>))
 import Combine.Char exposing (char, space)
 import Html exposing (..)
 import String
@@ -41,7 +40,7 @@ liWrong wl =
 parseList : List String -> List Model
 parseList =
   List.indexedMap (\i l -> (i + 1, eraseComment l))
-    >> List.filter (not << isIgnored << snd)
+    >> List.filter (not << isIgnored << Tuple.second)
     >> List.map (uncurry parse)
 
 
@@ -64,16 +63,15 @@ parse lineNumber line =
           <*> priceParser
           <*  (twoOrMoreSpaces <?> errorNoSeparatorAfterPrice)
           <*> groupField
-      (result, _) = Combine.parse parser line
   in
-      case result of
-        Ok successLine ->
+      case Combine.parse parser line of
+        Ok (_, _, successLine) ->
           Ok successLine
-        Err errorMessages ->
+        Err (_, _, errorMessages) ->
           Err <| Wrong lineNumber (String.join ", " errorMessages) line
 
 
-twoOrMoreSpaces : Combine.Parser ()
+twoOrMoreSpaces : Combine.Parser s ()
 twoOrMoreSpaces =
   () <$ Combine.regex " {2,}"
 

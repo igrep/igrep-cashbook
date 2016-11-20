@@ -2,10 +2,10 @@ module Main exposing (..)
 
 import IgrepCashbook.App
 
-import Html.App as Html
+import Html
 
 
-main : Program Never
+main : Program Never IgrepCashbook.App.Model IgrepCashbook.App.Msg
 main =
   Html.program
   { init = IgrepCashbook.App.init
