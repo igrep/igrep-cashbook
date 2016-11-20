@@ -1,13 +1,7 @@
 module Tests exposing (..)
 
-import ElmTest exposing
-  ( test
-  , Test
-  , suite
-  , assert
-  , assertEqual
-  , runSuiteHtml
-  )
+import Test exposing (..)
+import Expect
 
 import IgrepCashbook.FileList as FileList
 import IgrepCashbook.File as File
@@ -19,63 +13,61 @@ import Dict
 
 all : Test
 all =
-  suite "IgrepCashbook"
-    [ suite ".FileList"
-      [ suite ".extractFromHtml"
+  describe "IgrepCashbook"
+    [ describe ".FileList"
+      [ describe ".extractFromHtml"
         [ test "parses html returned by wai-app-static server" <|
-          assertEqual expectedPaths (FileList.extractFromHtml htmlFromWarp)
+          \() -> Expect.equal expectedPaths (FileList.extractFromHtml htmlFromWarp)
         , test "parses html returned by elm-reactor" <|
-          assertEqual expectedPaths (FileList.extractFromHtml htmlFromElmReactor)
+          \() -> Expect.equal expectedPaths (FileList.extractFromHtml htmlFromElmReactor)
         , test "parses html returned by lighttpd" <|
-          assertEqual expectedPaths (FileList.extractFromHtml htmlFromLighttpd)
+          \() -> Expect.equal expectedPaths (FileList.extractFromHtml htmlFromLighttpd)
         ]
-      , suite ".latestFileNameOf"
+      , describe ".latestFileNameOf"
         [ test
             "given a file list containing only non-dash-ending file, returns the latest file name."
             <|
               let model = FileList.fromPaths ["15-06.txt", "15-07.txt", "15-08.txt"]
               in
-                  assertEqual "15-08.txt" (FileList.latestFileNameOf model)
+                  \() -> Expect.equal "15-08.txt" (FileList.latestFileNameOf model)
         , test
             "given a file list containing dash-ending file, returns the latest non-dash-ending file name."
             <|
               let model = FileList.fromPaths ["15-12.txt", "15-11.txt", "15-10.txt", "15-13-.txt"]
               in
-                  assertEqual "15-12.txt" (FileList.latestFileNameOf model)
+                  \() -> Expect.equal "15-12.txt" (FileList.latestFileNameOf model)
         , test "given an empty file list, returns an empty file name." <|
           let model = Ok { files = Dict.empty }
           in
-              assertEqual "" (FileList.latestFileNameOf model)
+              \() -> Expect.equal "" (FileList.latestFileNameOf model)
         , test "given an error file list, returns an empty file name." <|
           let model = Err "error"
           in
-              assertEqual "" (FileList.latestFileNameOf model)
+              \() -> Expect.equal "" (FileList.latestFileNameOf model)
         ]
       ]
 
-    , suite ".File"
-      [ suite ".parse"
+    , describe ".File"
+      [ describe ".parse"
         [ test "given lines representing cashbook lines, returns parsed lines" <|
-            assertEqual
-              (File.Model "name" expectedLines True)
-              (File.parse "name" exampleCashbookData)
+            \() ->
+              Expect.equal
+                (File.Model "name" expectedLines True)
+                (File.parse "name" exampleCashbookData)
         ]
       ]
 
-    , suite ".Summary"
-      [ suite ".calculate"
+    , describe ".Summary"
+      [ describe ".calculate"
         [ test "given cashbook files, calculates sums by group" <|
-            assertEqual
-              -- FIXME: Workaround for the bug of (==) for complex structures
-              (toString expectedSummary)
-              (toString <| Summary.calculate exampleFiles)
+            \() ->
+              Expect.equal
+                -- FIXME: Workaround for the bug of (==) for complex structures
+                (toString expectedSummary)
+                (toString <| Summary.calculate exampleFiles)
         ]
       ]
     ]
-
-
-main : Program Never
-main = runSuiteHtml all
 
 
 expectedPaths : List String
