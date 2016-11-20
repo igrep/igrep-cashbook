@@ -23,8 +23,6 @@
   },
   "homepage": "https://github.com/igrep/igrep-cashbook#readme",
   "devDependencies": {
-    "elm-test": "^0.16.0",
-    "elm-webpack-loader": "^3.0.3",
-    "webpack": "^1.12.10"
+    "elm-test": "^0.18.0"
   }
 }

@@ -1,5 +1,6 @@
 module IgrepCashbook.App exposing
   ( Model
+  , Msg
   , init
   , update
   , view
@@ -9,10 +10,9 @@ import IgrepCashbook.Summary as Summary
 import IgrepCashbook.FileList as FileList
 
 import Html exposing (..)
-import Html.App as Html
 import Http
 import String
-import Task exposing (andThen)
+import Task exposing (andThen, onError)
 import Time
 
 
@@ -36,25 +36,25 @@ init =
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
-update a m =
+update a m1 =
   case a of
     FetchFileListData s ->
-      let m' =
-        { m | fileList = FileList.replaceByData s m.fileList }
+      let m2 =
+        { m1 | fileList = FileList.replaceByData s m1.fileList }
       in
-      (m', fetchFile <| FileList.latestFileNameOf m'.fileList)
+      (m2, fetchFile <| FileList.latestFileNameOf m2.fileList)
     FetchCashbookData fileName s ->
-      let m' = { m | fileList = (FileList.parseAndSet fileName s) m.fileList }
+      let m2 = { m1 | fileList = (FileList.parseAndSet fileName s) m1.fileList }
       in
-          (updateSummary m', Cmd.none)
+          (updateSummary m2, Cmd.none)
     ModifyFileList fileListAction ->
-      let (fileList', fileNameToFetch) = FileList.update fileListAction m.fileList
-          m' = { m | fileList = fileList' }
+      let (fileList_, fileNameToFetch) = FileList.update fileListAction m1.fileList
+          m2 = { m1 | fileList = fileList_ }
       in
           case fileNameToFetch of
-            Just fileName -> (m', fetchFile fileName)
+            Just fileName -> (m2, fetchFile fileName)
             -- No fileNameToFetch means the file is unselected.
-            _ -> (updateSummary m', Cmd.none)
+            _ -> (updateSummary m2, Cmd.none)
 
 
 updateSummary : Model -> Model
@@ -80,10 +80,11 @@ fetchFile fileName =
 fetchFromPathToTask : String -> (String -> Msg) -> Cmd Msg
 fetchFromPathToTask path dataToAction =
   let getData =
-        Time.now `andThen` \time ->
-          Http.getString (path ++ "?_=" ++ toString time)
+        Time.now
+          |> andThen (\time -> Http.toTask <| Http.getString (path ++ "?_=" ++ toString time))
+          |> onError (\e -> Debug.crash <| "Assertion failure: " ++ toString e)
   in
-    Task.perform (\e -> Debug.crash <| "Assertion failure: " ++ toString e) dataToAction getData
+    Task.perform dataToAction getData
 
 
 view : Model -> Html Msg
