@@ -2,14 +2,14 @@ module Main exposing (..)
 
 import IgrepCashbook.App
 
-import Html
+import Navigation
 
 
 main : Program Never IgrepCashbook.App.Model IgrepCashbook.App.Msg
 main =
-  Html.program
-  { init = IgrepCashbook.App.init
-  , update = IgrepCashbook.App.update
-  , view = IgrepCashbook.App.view
-  , subscriptions = always Sub.none
-  }
+  Navigation.program IgrepCashbook.App.ReplaceLocation
+    { init = IgrepCashbook.App.initModelFromLocation
+    , update = IgrepCashbook.App.update
+    , view = IgrepCashbook.App.view
+    , subscriptions = always Sub.none
+    }
