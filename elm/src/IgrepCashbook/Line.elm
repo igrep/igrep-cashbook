@@ -98,7 +98,7 @@ dateRegex =
 
 commentRegex : Regex
 commentRegex =
-  Regex.regex "#.*"
+  Regex.regex "^#.*"
 
 
 priceSeparatorRegex : Regex
