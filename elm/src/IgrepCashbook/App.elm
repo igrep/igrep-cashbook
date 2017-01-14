@@ -42,7 +42,7 @@ initModelFromLocation location =
     if List.isEmpty paths then
       (init, initialFetch)
     else
-      (init, fetchFiles paths)
+      (init, fetchTxtFiles paths)
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -65,9 +65,13 @@ update a m1 =
           Just fileName -> (m2, fetchFile fileName)
           -- No fileNameToFetch means the file is unselected.
           _ -> (updateSummary m2, Cmd.none)
-    ReplaceLocation _ ->
-      -- Do nothing. URL is modified after modifying the model
-      (m1, Cmd.none)
+    ReplaceLocation location ->
+      let paths = (UrlHandler.parse location).paths
+      in
+        if List.isEmpty paths then
+          (m1, Cmd.none)
+        else
+          (init, fetchTxtFiles paths)
 
 
 updateSummary : Model -> Model
@@ -90,9 +94,14 @@ fetchFile fileName =
     fetchFromPathToCmd ("/" ++ fileName) (FetchCashbookData fileName)
 
 
-fetchFiles : List String -> Cmd Msg
-fetchFiles fileNames =
-  Cmd.batch <| List.map fetchFile fileNames
+fetchTxtFile : String -> Cmd Msg
+fetchTxtFile fileName =
+  fetchFile <| fileName ++ ".txt"
+
+
+fetchTxtFiles : List String -> Cmd Msg
+fetchTxtFiles fileNames =
+  Cmd.batch <| List.map fetchTxtFile fileNames
 
 
 fetchFromPathToCmd : String -> (String -> Msg) -> Cmd Msg
