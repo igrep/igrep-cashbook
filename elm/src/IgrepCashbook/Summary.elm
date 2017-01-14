@@ -11,6 +11,7 @@ import IgrepCashbook.Line as Line
 
 import Dict exposing (Dict)
 import Html exposing (..)
+import Html.Attributes exposing (class)
 import Maybe
 
 type alias Model =
@@ -118,7 +119,7 @@ trSubTotal s =
 
 toTableRow : (String, Int) -> Html msg
 toTableRow (header, value) =
-  tr [] [th [] [text header], td [] [text (toString <| abs value)]]
+  tr [] [th [] [text header], td [class "summaryRowValue"] [text (toString <| abs value)]]
 
 
 subTotal : SubSummary -> Int
