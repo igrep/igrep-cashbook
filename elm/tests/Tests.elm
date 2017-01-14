@@ -100,6 +100,9 @@ exampleCashbookData = """
  Another things I bought  10_000  Group2
  Yet another income  +10  Group2
  Yet another things I bought  1000  Group2
+
+# Should parse a string containing hash sign.
+ Some Meet Up #1  1  Group1
  Wrong line (only 1 space between name and price) 1000  Group2
  Wrong line (only 1 space between price and group)  1000 Group2
  Wrong line (no group1)  1000
@@ -118,10 +121,10 @@ exampleFiles =
 
 expectedSummary : Summary.Model
 expectedSummary =
-  let totalExpenditures = (-2000 + -10000 + -1000) * 2
+  let totalExpenditures = (-2000 + -10000 + -1000 + -1) * 2
       expenditures =
         SubSummary
-          (Dict.fromList [("Group1", -2000 * 2), ("Group2", (-10000 + -1000) * 2)])
+          (Dict.fromList [("Group1", -2001 * 2), ("Group2", (-10000 + -1000) * 2)])
           totalExpenditures
       totalIncomes = (12300000 + 100 + 10) * 2
       incomes =
@@ -144,19 +147,20 @@ expectedLines =
   , Ok <| Success -10000 "Group2"
   , Ok <| Success 10 "Group2"
   , Ok <| Success -1000 "Group2"
+  , Ok <| Success -1 "Group1"
   ] ++ List.map Err expectedWrongLines
 
 
 expectedWrongLines : List Line.Wrong
 expectedWrongLines =
-  [ Wrong 18 Line.errorInvalidPrice          " Wrong line (only 1 space between name and price) 1000  Group2"
-  , Wrong 19 Line.errorNoSeparatorAfterPrice " Wrong line (only 1 space between price and group)  1000 Group2"
-  , Wrong 20 Line.errorNoSeparatorAfterPrice " Wrong line (no group1)  1000"
-  , Wrong 21 Line.errorNoGroup               " Wrong line (no group2)  1000  "
-  , Wrong 22 Line.errorNoName                "   1000  NoName"
-  , Wrong 23 Line.errorInvalidPrice          " Wrong line (price is 0)  0  Group2"
-  , Wrong 24 Line.errorInvalidPrice          " Wrong line (malformed price)  -0  Group2"
-  , Wrong 25 Line.errorInvalidPrice          " Wrong line (malformed price)  0+  Group2"
+  [ Wrong 21 Line.errorInvalidPrice          " Wrong line (only 1 space between name and price) 1000  Group2"
+  , Wrong 22 Line.errorNoSeparatorAfterPrice " Wrong line (only 1 space between price and group)  1000 Group2"
+  , Wrong 23 Line.errorNoSeparatorAfterPrice " Wrong line (no group1)  1000"
+  , Wrong 24 Line.errorNoGroup               " Wrong line (no group2)  1000  "
+  , Wrong 25 Line.errorNoName                "   1000  NoName"
+  , Wrong 26 Line.errorInvalidPrice          " Wrong line (price is 0)  0  Group2"
+  , Wrong 27 Line.errorInvalidPrice          " Wrong line (malformed price)  -0  Group2"
+  , Wrong 28 Line.errorInvalidPrice          " Wrong line (malformed price)  0+  Group2"
   ]
 
 
