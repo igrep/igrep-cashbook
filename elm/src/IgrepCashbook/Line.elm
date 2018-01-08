@@ -86,11 +86,6 @@ eraseComment =
   Regex.replace (Regex.AtMost 1) commentRegex (always "")
 
 
-recordRegex : Regex
-recordRegex =
-  Regex.regex "^(\\S+) {2,}(\\S*) {2,}(\\S*)"
-
-
 dateRegex : Regex
 dateRegex =
   Regex.regex "^(\\d\\d/)?\\d\\d/\\d\\d"
