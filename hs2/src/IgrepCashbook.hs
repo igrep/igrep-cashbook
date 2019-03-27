@@ -4,7 +4,8 @@
 
 module IgrepCashbook
   ( Entry(..)
-  , main
+  , buildSummary
+  , summaryToConsoleOutput
   , parseLines
   , entryLine
   , toEntryLine
@@ -14,7 +15,6 @@ module IgrepCashbook
 import           Control.Applicative            (many, optional, (<|>))
 import           Control.Arrow                  ((>>>))
 import           Control.Foldl                  (FoldM (FoldM))
-import qualified Control.Foldl                  as Foldl
 import           Control.Monad                  (void)
 import           Control.Monad.Combinators.Expr
 import           Data.Char                      (isDigit)
@@ -30,11 +30,8 @@ import           Data.Text                      (Text)
 import qualified Data.Text                      as Text
 import qualified Data.Text.Lazy                 as Lazy
 import qualified Data.Text.Lazy.Builder         as TextBuilder
-import qualified Data.Text.Lazy.IO              as Lazy
 import qualified Data.Text.Lazy.Read            as Lazy
 import           Data.Void                      (Void)
-import           System.Environment             (getArgs)
-import           System.IO                      (stderr)
 import           Text.Megaparsec                (ParseErrorBundle, Parsec,
                                                  anySingleBut,
                                                  errorBundlePretty, label,
@@ -71,18 +68,11 @@ type Parser = Parsec Void Lazy.Text
 type LineError = ParseErrorBundle Lazy.Text Void
 
 
-main :: IO ()
-main = do
-  (err, out) <- summaryToConsoleOutput <$> (Foldl.foldM buildSummary =<< getArgs)
-  Lazy.putStr out
-  Lazy.hPutStr stderr err
-
-
-buildSummary :: FoldM IO FilePath Summary
-buildSummary = FoldM step initial return
+buildSummary :: Monad m => (FilePath -> m Lazy.Text) -> FoldM m FilePath Summary
+buildSummary readF = FoldM step initial return
   where
     step s path = do
-      (errors, entries) <- partitionEithers . parseLines path <$> Lazy.readFile path
+      (errors, entries) <- partitionEithers . parseLines path <$> readF path
       let (incomes, expenditures) = partition entryIsIncome entries
       return $ Summary
         (summaryExpenditures s <> subSummaryFromEntries expenditures)
