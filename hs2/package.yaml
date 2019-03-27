@@ -24,7 +24,7 @@ dependencies:
 - containers
 - text
 - megaparsec
-- NoTrace
+- parser-combinators
 
 library:
   source-dirs: src

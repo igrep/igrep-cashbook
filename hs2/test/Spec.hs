@@ -1,19 +1,17 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 import           Test.Hspec
-import           Test.Hspec.QuickCheck
 import           Test.Hspec.Megaparsec
+import           Test.Hspec.QuickCheck
 import           Test.QuickCheck
 
-import           Control.Monad (forM_)
-import           Data.Char (isPrint)
+import           Control.Monad         (forM_)
+import           Data.Char             (isPrint)
 import           Data.Either
-import           Data.Monoid ((<>))
-import qualified Data.Text as Text
-import qualified Data.Text.Lazy as Lazy
+import           Data.Monoid           ((<>))
+import qualified Data.Text             as Text
+import qualified Data.Text.Lazy        as Lazy
 import           Text.Megaparsec
-
-import           Debug.NoTrace (traceM)
 
 import qualified IgrepCashbook
 
@@ -61,7 +59,7 @@ main = hspec $ do
             ]
       IgrepCashbook.parseLines "test" input `shouldSatisfy` all isLeft
 
-    it "given an empty lines, returns empty entries" $ 
+    it "given an empty lines, returns empty entries" $
       IgrepCashbook.parseLines "test" "" `shouldBe` []
 
   describe "IgrepCashbook.entryLine" $ do
@@ -81,7 +79,6 @@ main = hspec $ do
                 && Text.all isPrint t
     prop "parses arbitrary cashbook entry separated by two spaces" $ forAll entryG $ \e -> do
       let el = IgrepCashbook.toEntryLine e
-      traceM $ show el
       parse IgrepCashbook.entryLine "test" el `shouldParse` e
 
     let mkCases(ex, expected) =

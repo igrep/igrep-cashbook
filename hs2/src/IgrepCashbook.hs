@@ -1,6 +1,6 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE OverloadedStrings          #-}
+{-# LANGUAGE RecordWildCards            #-}
 
 module IgrepCashbook
   ( Entry(..)
@@ -11,35 +11,39 @@ module IgrepCashbook
   ) where
 
 
-import           Control.Arrow ((>>>))
-import           Control.Foldl (FoldM(FoldM))
-import qualified Control.Foldl as Foldl
-import           Control.Monad (void)
-import           Data.Char (isDigit)
-import           Data.Either (partitionEithers)
-import           Data.Foldable (foldMap)
-import           Data.Functor (($>))
-import           Data.List (partition, sortBy)
-import           Data.Maybe (mapMaybe)
-import           Data.Map.Monoidal.Strict (MonoidalMap)
-import qualified Data.Map.Monoidal.Strict as MonoidalMap
-import           Data.Monoid (Sum(..), (<>))
-import           Data.Ord (comparing)
-import           Data.Text (Text)
-import qualified Data.Text as Text
-import qualified Data.Text.Lazy as Lazy
-import qualified Data.Text.Lazy.IO as Lazy
-import qualified Data.Text.Lazy.Builder as TextBuilder
-import qualified Data.Text.Lazy.Read as Lazy
-import           Data.Void (Void)
-import           System.Environment (getArgs)
-import           System.IO (stderr)
-import           Text.Megaparsec
+import           Control.Applicative            (many, optional, (<|>))
+import           Control.Arrow                  ((>>>))
+import           Control.Foldl                  (FoldM (FoldM))
+import qualified Control.Foldl                  as Foldl
+import           Control.Monad                  (void)
+import           Control.Monad.Combinators.Expr
+import           Data.Char                      (isDigit)
+import           Data.Either                    (partitionEithers)
+import           Data.Foldable                  (foldMap)
+import           Data.Functor                   (($>))
+import           Data.List                      (partition, sortBy)
+import           Data.Map.Monoidal.Strict       (MonoidalMap)
+import qualified Data.Map.Monoidal.Strict       as MonoidalMap
+import           Data.Maybe                     (mapMaybe)
+import           Data.Monoid                    (Sum (..), (<>))
+import           Data.Ord                       (comparing)
+import           Data.Text                      (Text)
+import qualified Data.Text                      as Text
+import qualified Data.Text.Lazy                 as Lazy
+import qualified Data.Text.Lazy.Builder         as TextBuilder
+import qualified Data.Text.Lazy.IO              as Lazy
+import qualified Data.Text.Lazy.Read            as Lazy
+import           Data.Void                      (Void)
+import           System.Environment             (getArgs)
+import           System.IO                      (stderr)
+import           Text.Megaparsec                (ParseErrorBundle, Parsec,
+                                                 anySingleBut,
+                                                 errorBundlePretty, label,
+                                                 noneOf, notFollowedBy, oneOf,
+                                                 parse, skipMany, skipSome,
+                                                 takeWhile1P, try, (<?>))
 import           Text.Megaparsec.Char
-import qualified Text.Megaparsec.Char.Lexer as L
-import           Text.Megaparsec.Expr
-
-import           Debug.NoTrace (traceShowId)
+import qualified Text.Megaparsec.Char.Lexer     as L
 
 
 data Summary =
@@ -52,20 +56,20 @@ data Summary =
 newtype SubSummary =
   SubSummary
     { subSummaryBreakdown :: MonoidalMap Text (Sum Int)
-    } deriving (Eq, Show, Monoid)
+    } deriving (Eq, Show, Semigroup, Monoid)
 
 data Entry =
   Entry
     { entryIsIncome :: !Bool
-    , entryAmount :: !Int
-    , entryGroup :: !Text
+    , entryAmount   :: !Int
+    , entryGroup    :: !Text
     } deriving (Eq, Show)
 
 type CashbookLine = Maybe Entry
 
 type Parser = Parsec Void Lazy.Text
 
-type LineError = ParseError Char Void
+type LineError = ParseErrorBundle Lazy.Text Void
 
 
 main :: IO ()
@@ -92,7 +96,7 @@ summaryToConsoleOutput :: Summary -> (Lazy.Text, Lazy.Text)
 summaryToConsoleOutput s = (err, out)
   where
     err = TextBuilder.toLazyText $ foldMap bErr $ summaryErrors s
-    bErr e = "[WARNING] " <> TextBuilder.fromString (parseErrorPretty e)
+    bErr e = "[WARNING] " <> TextBuilder.fromString (errorBundlePretty e)
     out = TextBuilder.toLazyText $
       "## EXPENDITURES ##\n"
         <> subSummaryToTextBuilder (summaryExpenditures s)
@@ -139,9 +143,9 @@ parseLines sn =
     >>> zipWith (\i -> parse cashbookLine (sn ++ " / " ++ show i)) [(1 :: Int)..]
     >>> mapMaybe f
   where
-    f (Left e) = Just $ Left e
+    f (Left e)         = Just $ Left e
     f (Right (Just e)) = Just $ Right e
-    f (Right Nothing) = Nothing
+    f (Right Nothing)  = Nothing
 
 
 cashbookLine :: Parser CashbookLine
@@ -198,7 +202,7 @@ entryLine = do
         expr = makeExprParser term table <?> "Amount expression"
 
         term :: Parser Int
-        term = parens expr <|> (traceShowId <$> lexeme amount) <?> "Amount term"
+        term = parens expr <|> (lexeme amount) <?> "Amount term"
 
         amount :: Parser Int
         amount =
@@ -257,7 +261,7 @@ spacesInLine = skipMany $ oneOf (" \t\v\f\x3000" :: String)
 
 
 restOfLine :: Parser ()
-restOfLine = skipMany $ notChar '\n'
+restOfLine = skipMany $ anySingleBut '\n'
 
 
 -- | Only for testing
