@@ -71,7 +71,7 @@ main = hspec $ do
             <*> icTextG
           where
             icTextG =
-              ((Text.strip . Text.pack) <$> arbitrary)
+              (Text.strip . Text.pack <$> arbitrary)
                 `suchThat` isIcText
             isIcText t =
               not (Text.null t)

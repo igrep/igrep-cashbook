@@ -21,12 +21,11 @@ import           Data.Char                      (isDigit)
 import           Data.Either                    (partitionEithers)
 import           Data.Foldable                  (foldMap)
 import           Data.Functor                   (($>))
-import           Data.List                      (partition, sortBy)
+import           Data.List                      (partition, sortOn)
 import           Data.Map.Monoidal.Strict       (MonoidalMap)
 import qualified Data.Map.Monoidal.Strict       as MonoidalMap
 import           Data.Maybe                     (mapMaybe)
 import           Data.Monoid                    (Sum (..), (<>))
-import           Data.Ord                       (comparing)
 import           Data.Text                      (Text)
 import qualified Data.Text                      as Text
 import qualified Data.Text.Lazy                 as Lazy
@@ -113,7 +112,7 @@ buildSummaryLine header val =
 
 subSummaryToTextBuilder :: SubSummary -> TextBuilder.Builder
 subSummaryToTextBuilder s =
-  foldMap buildSummaryLine' (sortBy (comparing snd) $ MonoidalMap.assocs $ subSummaryBreakdown s)
+  foldMap buildSummaryLine' (sortOn snd $ MonoidalMap.assocs $ subSummaryBreakdown s)
     <> buildSummaryLine "小計" (subSummarySubTotal s)
   where
     buildSummaryLine' (h, Sum v) =
@@ -202,7 +201,7 @@ entryLine = do
         expr = makeExprParser term table <?> "Amount expression"
 
         term :: Parser Int
-        term = parens expr <|> (lexeme amount) <?> "Amount term"
+        term = parens expr <|> lexeme amount <?> "Amount term"
 
         amount :: Parser Int
         amount =
