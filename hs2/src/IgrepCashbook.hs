@@ -130,7 +130,7 @@ summaryTotal Summary {..} =
 parseLines :: String -> Lazy.Text -> [Either LineError Entry]
 parseLines sn =
   Lazy.lines
-    >>> zipWith (\i -> parse cashbookLine (sn ++ " / " ++ show i)) [(1 :: Int)..]
+    >>> zipWith (\i -> parse cashbookLine (sn ++ ":" ++ show i)) [(1 :: Int)..]
     >>> mapMaybe f
   where
     f (Left e)         = Just $ Left e
