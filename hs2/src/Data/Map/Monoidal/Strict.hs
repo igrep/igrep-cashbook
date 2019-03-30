@@ -1,5 +1,3 @@
-{-# LANGUAGE CPP #-}
-
 -- Avoid to depend on monoidal-containers,
 -- which indirectly depends on template-haskell, which prevents me from building with asterius
 
@@ -35,6 +33,8 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -}
+
+{-# LANGUAGE CPP #-}
 
 module Data.Map.Monoidal.Strict
   ( MonoidalMap
