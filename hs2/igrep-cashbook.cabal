@@ -35,8 +35,6 @@ library
   import: very-common, common
   exposed-modules:
       IgrepCashbook
-  other-modules:
-      Paths_igrep_cashbook
   hs-source-dirs:
       src
   build-depends:
@@ -46,8 +44,6 @@ library
 executable sum
   import: very-common
   main-is: Main.hs
-  other-modules:
-      Paths_igrep_cashbook
   hs-source-dirs:
       app
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
@@ -60,8 +56,6 @@ test-suite igrep-cashbook-test
   import: very-common, common
   type: exitcode-stdio-1.0
   main-is: Spec.hs
-  other-modules:
-      Paths_igrep_cashbook
   hs-source-dirs:
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
