@@ -26,6 +26,7 @@ import           Data.Map.Monoidal.Strict       (MonoidalMap)
 import qualified Data.Map.Monoidal.Strict       as MonoidalMap
 import           Data.Maybe                     (mapMaybe)
 import           Data.Monoid                    (Sum (..), (<>))
+import           Data.Ord                       (Down (Down))
 import           Data.Text                      (Text)
 import qualified Data.Text                      as Text
 import qualified Data.Text.Lazy                 as Lazy
@@ -102,7 +103,7 @@ buildSummaryLine header val =
 
 subSummaryToTextBuilder :: SubSummary -> TextBuilder.Builder
 subSummaryToTextBuilder s =
-  foldMap buildSummaryLine' (sortOn snd $ MonoidalMap.assocs $ subSummaryBreakdown s)
+  foldMap buildSummaryLine' (sortOn (Down . snd) $ MonoidalMap.assocs $ subSummaryBreakdown s)
     <> buildSummaryLine "小計" (subSummarySubTotal s)
   where
     buildSummaryLine' (h, Sum v) =
