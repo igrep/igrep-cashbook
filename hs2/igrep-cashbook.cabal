@@ -35,10 +35,10 @@ library
   import: very-common, common
   exposed-modules:
       IgrepCashbook
+  other-modules:
+      Data.Map.Monoidal.Strict
   hs-source-dirs:
       src
-  build-depends:
-      monoidal-containers
   default-language: Haskell2010
 
 executable sum
@@ -60,8 +60,9 @@ test-suite igrep-cashbook-test
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      QuickCheck
+      igrep-cashbook
+    , QuickCheck
+    , fakefs
     , hspec
     , hspec-megaparsec
-    , igrep-cashbook
   default-language: Haskell2010

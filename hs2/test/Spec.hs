@@ -1,13 +1,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 
+import qualified Test.FileSystem.Fake as Fake
 import           Test.Hspec
 import           Test.Hspec.Megaparsec
 import           Test.Hspec.QuickCheck
 import           Test.QuickCheck
 
+import qualified Control.Foldl         as Foldl
 import           Control.Monad         (forM_)
 import           Data.Char             (isPrint)
 import           Data.Either
+import qualified Data.Map.Strict       as M
 import           Data.Monoid           ((<>))
 import qualified Data.Text             as Text
 import qualified Data.Text.Lazy        as Lazy
@@ -18,6 +21,59 @@ import qualified IgrepCashbook
 
 main :: IO ()
 main = hspec $ do
+  describe "IgrepCashbook.buildSummary" $
+    it "sums up cashbook files" $ do
+      let files = M.fromList
+            [ ( "1.txt"
+              , Lazy.unlines
+                [ "15/07/25"
+                , " 基本給  +200,000  給料"
+                , "15/08/02"
+                , " バス  216  交通費"
+                , "15/08/03"
+                , " 本  2,880  勉強"
+                , "15/08/04"
+                , " CD 売却  +10  その他"
+                , "15/08/08"
+                , "# This is a comment"
+                , " CD  2_100  娯楽"
+                ]
+              )
+            , ("2.txt"
+              , Lazy.unlines
+                [ "19/02/25"
+                , " 基本給  +240,000  給料"
+                , " 通信料  2000  その他  # comment"
+                , "19/03/01"
+                , " カレー  950  外食"
+                , " バス 216  交通費"
+                , "19/03/03"
+                , " 本 売却  +250  その他"
+                ]
+              )
+            ]
+          action =
+            IgrepCashbook.summaryToConsoleOutput
+              <$> Foldl.foldM (IgrepCashbook.buildSummary Fake.readPath) (M.keys files)
+          expectedErr =
+            "[WARNING] 2.txt:6:1:10:\n  |\n1 |  \12496\12473 216  \20132\36890\36027\n  |          ^\nunexpected '\20132'\nexpecting '+', Amount expression, or whitespace\n"
+          expectedOut = Lazy.unlines
+            [ "## EXPENDITURES ##"
+            , "勉強\t2880"
+            , "娯楽\t2100"
+            , "その他\t2000"
+            , "外食\t950"
+            , "交通費\t216"
+            , "小計\t8146"
+            , ""
+            , "#### INCOMES ####"
+            , "給料\t440000"
+            , "その他\t260"
+            , "小計\t440260"
+            , ""
+            , "合計\t432114"
+            ]
+      Fake.evalFileSystemM files action `shouldBe` Right (expectedErr, expectedOut)
   describe "IgrepCashbook.parseLines" $ do
     it "parses date lines, comments, and entry lines" $ do
       let input = Lazy.unlines
@@ -81,7 +137,7 @@ main = hspec $ do
       let el = IgrepCashbook.toEntryLine e
       parse IgrepCashbook.entryLine "test" el `shouldParse` e
 
-    let mkCases(ex, expected) =
+    let mkCases (ex, expected) =
           [ (" item*  " <> ex <> "  group", mkEx expected)
           , (" item*+  " <> "+(" <> ex <> ")" <> "  income", mkIn expected)
           , (" itemNoSpace*  " <> expNoSpace <> "  group", mkEx expected)
