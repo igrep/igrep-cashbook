@@ -22,7 +22,6 @@ source-repository head
 common very-common
   build-depends:
       base >= 4.7 && < 5
-    , foldl
     , text
 
 common common
@@ -35,6 +34,7 @@ library
   import: very-common, common
   exposed-modules:
       IgrepCashbook
+    , Control.Foldl
   other-modules:
       Data.Map.Monoidal.Strict
   hs-source-dirs:
