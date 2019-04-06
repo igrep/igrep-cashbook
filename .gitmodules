@@ -1,0 +1,4 @@
+[submodule "hs2/vendor/text"]
+	path = hs2/vendor/text
+	url = https://github.com/igrep/text.git
+	branch = no-io

@@ -1,0 +1,7 @@
+packages:
+  ./
+  ./vendor/text
+  http://head.hackage.haskell.org/package/primitive-0.6.4.0.tar.gz
+  http://head.hackage.haskell.org/package/megaparsec-7.0.4.tar.gz
+allow-newer: all
+flags: +asterius
