@@ -57,7 +57,7 @@ executable sum
 
   if flag(asterius)
     hs-source-dirs: wasm
-    ld-options:     -optl--export-function=sumIgrepCashbook
+    ghc-options:    -optl--export-function=sumIgrepCashbook
   else
     hs-source-dirs: app
 
