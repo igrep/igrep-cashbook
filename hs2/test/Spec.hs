@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-import qualified Test.FileSystem.Fake as Fake
+import qualified Test.FileSystem.Fake  as Fake
 import           Test.Hspec
 import           Test.Hspec.Megaparsec
 import           Test.Hspec.QuickCheck
@@ -11,7 +11,6 @@ import           Control.Monad         (forM_)
 import           Data.Char             (isPrint)
 import           Data.Either
 import qualified Data.Map.Strict       as M
-import           Data.Monoid           ((<>))
 import qualified Data.Text             as Text
 import qualified Data.Text.Lazy        as Lazy
 import           Text.Megaparsec
@@ -98,22 +97,33 @@ main = hspec $ do
             ]
       IgrepCashbook.parseLines "test" input `shouldBe` expected
 
-    it "given lines containing errors, reports the error" $ do
-      let input = Lazy.unlines
-            [ "15/07/25"
-            , " 基本給  +200,000  "
-            , "15/08/02"
-            , "   216  交通費"
-            , "15/08/03"
-            , ""
-            , "15/08/04"
-            , " CD 売却  *10  その他"
-            , " Zero  0  その他"
-            , "15/08/08"
-            , "# This is a comment"
-            , " CD  -2_100  娯楽"
-            ]
-      IgrepCashbook.parseLines "test" input `shouldSatisfy` all isLeft
+    let errLines =
+          [ " 基本給  +200,000  "
+          , "   216  交通費"
+          , " CD 売却  *10  その他"
+          , " Zero  0  その他"
+          , " CD  -2_100  娯楽"
+          , " CD 2_100  娯楽"
+          ]
+        ignoredLines =
+          [ "15/07/25"
+          , "15/08/02"
+          , "15/08/03"
+          , "15/08/04"
+          , "15/08/08"
+          , "# This is a comment"
+          ]
+        gen = do
+          els <- sublistOf errLines
+          ils <- sublistOf ignoredLines
+          mixedLines <- shuffle $ els ++ ils
+          pure (els, mixedLines)
+     in prop "given lines containing errors, reports errors as many as the actual number of error lines"
+        . forAll gen $ \(els, mixedLines) -> do
+          let input = Lazy.unlines $ map Lazy.pack mixedLines
+              actual = IgrepCashbook.parseLines "test" input
+          actual `shouldSatisfy` all isLeft
+          length actual `shouldBe` length els
 
     it "given an empty lines, returns empty entries" $
       IgrepCashbook.parseLines "test" "" `shouldBe` []

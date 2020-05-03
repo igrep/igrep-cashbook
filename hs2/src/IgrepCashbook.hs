@@ -19,13 +19,12 @@ import           Control.Monad                  (void)
 import           Control.Monad.Combinators.Expr
 import           Data.Char                      (isDigit)
 import           Data.Either                    (partitionEithers)
-import           Data.Foldable                  (foldMap)
 import           Data.Functor                   (($>))
 import           Data.List                      (partition, sortOn)
 import           Data.Map.Monoidal.Strict       (MonoidalMap)
 import qualified Data.Map.Monoidal.Strict       as MonoidalMap
 import           Data.Maybe                     (mapMaybe)
-import           Data.Monoid                    (Sum (..), (<>))
+import           Data.Monoid                    (Sum (..))
 import           Data.Ord                       (Down (Down))
 import           Data.Text                      (Text)
 import qualified Data.Text                      as Text
